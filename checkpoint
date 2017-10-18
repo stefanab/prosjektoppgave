@@ -1,0 +1,2 @@
+model_checkpoint_path: "/home/pi/Desktop/prosjektoppgave/prosjektoppgave/tflearncnn.model"
+all_model_checkpoint_paths: "/home/pi/Desktop/prosjektoppgave/prosjektoppgave/tflearncnn.model"
