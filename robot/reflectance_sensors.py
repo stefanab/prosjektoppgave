@@ -124,6 +124,7 @@ class ReflectanceSensors():
     # Uses the calibrated min and maxs for each sensor to return a normalized
     # value for the @param sensor_time for the given @param index
     def normalize(self, index, sensor_time):
+        print("normalize")
         normalized_value = float(sensor_time) / (self.max_val[index] - self.min_val[index])
         if (normalized_value > 1.0):
             return 1.0
