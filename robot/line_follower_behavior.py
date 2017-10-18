@@ -24,7 +24,7 @@ class FollowLine(bbc.Behavior):
     # This is the core method for behavior computation; it needs to be subclassed.
     # It's main jobs are a) read sensors, b) update the behavior's match_degree, c) set the motor requests.
     def sense_and_act(self):
-        # We only have on sensor object which is the ReflectanceSensors
+        # We only have one sensor object which is the ReflectanceSensors
         sensob = self.sensobs[0]
 
         values = sensob.get_value() # Returns a 6 dimensional vector 

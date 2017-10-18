@@ -5,6 +5,11 @@ import signal
 import sys
 from reflectance_sensors import ReflectanceSensors
 
+def cleanUp():
+    motors.stop()
+    GPIO.cleanup()
+    sys.exit(0)
+
 main():
 	motor    = motors.Motors()
 	infrared = reflectance_sensors.ReflectanceSensors()
