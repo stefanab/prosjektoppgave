@@ -4,8 +4,8 @@ import RPi.GPIO as GPIO
 from time import sleep
 import signal
 import sys
-from motors import Motors
-from reflectance_sensors import ReflectanceSensors
+from robot.motors import Motors
+from robot.reflectance_sensors import ReflectanceSensors
 
 def cleanUp():
     motors.stop()
@@ -16,7 +16,9 @@ def cleanUp():
 def main():
     motors    = Motors()
     infrared  = ReflectanceSensors()
-	(infrared.update())
+    infrared.calibrate()
+    infrared.update()
+    sleep(5)
     print("setup")
         
 	# To exit the program properly on keyboardinterrupt
@@ -30,36 +32,38 @@ def main():
 	
     ##motors.forward(dur=1)
     iteration = 0
-	while(!isGoal(infrared) && iteration < 5):
-        (infrared.update())
-	    motors.forward(dur=.3)
-		sleep(1)
-		iteration += 1
-	   
+    while(not isGoal(infrared) and iteration < 5):
+	motors.forward(dur=1)
+	infrared.update()
+	sleep(1)
+	iteration += 1
     
-##    motors.stop()
-  ##  GPIO.cleanup()
+    motors.stop()
+    GPIO.cleanup()
 ##    
     
 def isGoal(infrared):
 	values = infrared.get_value()
 	darks = 0
+	avg = 0
+	vSum = 0
+	print(values)
 	for i in range(len(values)):
-        value = values[i]
-        if value > 0.2:
-            darks += 1
+            value = values[i]
+            if value < 0.8:
+                darks += 1
 
-        if value > 0.05:
-            avg += (value * i * 1000);
-            vSum += value;
+            if value < 0.75:
+                avg += (value * i * 1000);
+                vSum += value;
 
 			
 	print("darks " + str(darks))
 	
 	if(darks >= 6):
-		return true
+	    return True
 	else:
-		return false
+	    return False
 	
 	
 	
