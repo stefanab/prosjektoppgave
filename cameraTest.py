@@ -21,7 +21,7 @@ with picamera.PiCamera(resolution=(128,96)) as camera:
     try:
         for i, filename in enumerate(camera.capture_continuous(os.path.join(directory, 'image{counter:02d}.jpg'))):
             print(filename)
-            sleep(1)
+            sleep(.1)
             if(i == images ):
                 break
     finally:
