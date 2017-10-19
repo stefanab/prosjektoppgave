@@ -26,7 +26,10 @@ def main():
        motors.stop()
        GPIO.cleanup()
        sys.exit(0)
+	   
     signal.signal(signal.SIGINT, signal_handler)
+	
+	
     ##motors.forward(dur=1)
     iteration = 0
     while(not isGoal(infrared) and iteration < 5):
