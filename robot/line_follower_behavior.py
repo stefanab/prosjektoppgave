@@ -2,16 +2,17 @@
 import bbcon as bbc # Behavior-based controller
 from reflectance_sensors import ReflectanceSensors
 from motors import Motors
+import math
 
-# A subclass of Behavior which details the behavior of following a line
+# A subclass of Behavior which details the behavior of following a line. Assumtion is that lines will be dark.
 class FollowLine(bbc.Behavior):
 
     def __init__(self, bbcon, sensobs=[], trigger=None, act=True, pri=3):
-        self.MAX_SPEED = 1000
-        self.num_sensors = 6
-
-        self.alpha = 0.75
-        self.middle_value = 2500
+        self.MAX_SPEED       = 1000
+        self.num_sensors     = 6
+		self.colors          = [-1, -1, -1, -1, -1, -1]
+        self.alpha           = 0.75
+        self.middle_value    = 2500
         self.previous_errors = [0, 0, 0, 0, 0, 0]
 
         self.last_value = 0 # Initially assume line was last seen on the left
@@ -35,60 +36,91 @@ class FollowLine(bbc.Behavior):
         avg = 0.0
         vSum = 0.0 
         onLine = 0
+		
         for i in range(len(values)):
-            value = values[i]
-            if value > 0.2:
-                onLine = 1
+			if(i < len(values)/2):
+                valueLeft  = values[i]
+			    valueRight = values[len(values)-1-i]
+                vSum += (valueLeft - valueRight ) * (10/i) * 100 
+			
+			if(values[i] < 0.07): self.colors[i] = 0
+			    
+			else if(values[i] > 0.93): self.colors[i] = 1
+			
+			else: self.colors[i] = -1
 
-            if value > 0.05:
-                avg += (value * i * 1000);
-                vSum += value;
 
-        if(onLine == 0):
-            # If it last read to the left of center, set last_value to 0.
-            if(self.last_value < self.middle_value): 
-                self.last_value = 0
+		if(checkHalt()):
+		    self.request_halt()
+		
+        self.last_value = vSum
 
-            # If it last read to the right of center, set last_value to max
-            else:
-                self.last_value = (self.num_sensors-1)*1000
-        else:
-            print("on line!")
-            self.last_value = avg/vSum
+		
 
         # Use the self.last_value to determine what the motors should be set two
         return self.set_motors()
 
+	def checkHalt():
+		sum = sum_colors
+		if sum == 6:
+		    return True
+		
+		
+		if(sum == 3):
+		    first_color = self.colors[0]
+			if(first_color == 0):
+			    match = 1
+			    excpected = 1
+			    while(self.colors[match] == excpected and match < 6):
+			        match += 1
+					excpected = 0 if excpeted == 1 else: excpected = 1
+			
+			else if(first_color == 1):
+			    match = 1
+			    excpected = 0
+			    while(self.colors[match] == excpected and match < 6):
+			        match += 1
+					excpected = 0 if excpeted == 1 else: excpected = 1
+		
+		
+		if(match == 6):
+		    return True
+			
+		return False
+		
     def set_motors(self):
         # Our "error" is how far we are away from the center of the line, which
         # corresponds to position 2500.
-        error = self.last_value - self.middle_value; 
+        #error = self.last_value - self.middle_value; 
+		print("line location: " + str(self.last_value))
+		# dark values are lower than light ones. Negative values means that there was more "Dark" on the left side.
+		# Means we should turn left
 
-        print("error: " + str(error))
 
+	    m1_speed = (self.MAX_SPEED + self.last_value)/4; # Divide by 4 so the robot doesn't go to fast
+        m2_speed = (self.MAX_SPEED - self.last_value)/4;
         #  Get motor speed difference using proportional and derivative PID terms
         #  (the integral term is generally not very useful for line following).
         #  Here we are using a proportional constant of 1/4 and a derivative
         #  constant of 6, which should work decently for many Zumo motor choices.
         #  You probably want to use trial and error to tune these constants for
         #  your particular Zumo and line course.
-        speed_difference = error / 4 + 6 * self.sum_weighted_errors(error) 
+        #speed_difference = error / 4 + 6 * self.sum_weighted_errors(error) 
 
-        print("speed_difference: " + str(speed_difference))
+        
 
         # Reset the previous error by shifting current errors one position and 
         # setting the first item in previous_error to the newly recorded error
-        i = len(self.previous_errors) - 1
-        while i > 0:
-            self.previous_errors[i] = self.previous_errors[i - 1] 
-            i -= 1
+        # i = len(self.previous_errors) - 1
+        # while i > 0:
+            # self.previous_errors[i] = self.previous_errors[i - 1] 
+            # i -= 1
 
-        self.previous_errors[0] = error 
+        # self.previous_errors[0] = error 
 
         # Get individual motor speeds.  The sign of speedDifference
         # determines if the robot turns left or right.
-        m1_speed = (self.MAX_SPEED + speed_difference)/4; # Divide by 4 so the robot doesn't go to fast
-        m2_speed = (self.MAX_SPEED - speed_difference)/4;
+
 
         # Here we constrain our motor speeds to be between 0 and MAX_SPEED.
         # Generally speaking, one motor will always be turning at MAX_SPEED
@@ -106,12 +138,19 @@ class FollowLine(bbc.Behavior):
 
         # If error is maximum (2500) then this motor request becomes essential for us to continue
         # following the line
-        match_degree = abs(error)/self.middle_value
+        match_degree = math.abs(self.last_value)
         self.set_match_degree(match_degree)
 
         # Set the motor_requests to be m1_speed and m2_speed
         self.set_motor_requests([int(m1_speed), int(m2_speed)])
 
+	def sum_colors(self):
+	    sum = 0
+		for i in range(len(self.colors)):
+		    sum += self.colors[i]
+			
+		return sum
+		
     def sum_weighted_errors(self, error):
         error_sum = 0
         i = 0

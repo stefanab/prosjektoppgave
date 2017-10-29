@@ -3,14 +3,14 @@ from time import sleep
 import signal
 import sys
 import RPi.GPIO as GPIO
-import bbcon as bbc # Behavior-based controller
-from reflectance_sensors import ReflectanceSensors
-from camera import Camera
-from motors import Motors
-from line_follower_behavior import FollowLine
-from camera_search_behavior import Camera_search
-from stop_follow_line_behavior import StopFollowLine
-from wander_behavior import Wander
+import robot.bbcon as bbc # Behavior-based controller
+from robot.reflectance_sensors import ReflectanceSensors
+from robot.camera import Camera
+from robot.motors import Motors
+from robot.line_follower_behavior import FollowLine
+from robot.camera_search_behavior import Camera_search
+from robot.stop_follow_line_behavior import StopFollowLine
+from robot.wander_behavior import Wander
 
 # Sub class for a BBCon where objectives can be specified specified
 class RobotController(bbc.BBCon):
@@ -23,10 +23,10 @@ class RobotController(bbc.BBCon):
 
     # Getters and setters for determining if the blob has been found
     # which are used by the behaviors
-    def set_gate_found(self, is_found): self.found_gate = is_found 
-    def is_gate_found(self): return self.found_gate
-    def set_blob_found(self, is_found): self.found_blob = is_found
-    def is_blob_found(self): return self.found_blob
+    # def set_gate_found(self, is_found): self.found_gate = is_found 
+    # def is_gate_found(self): return self.found_gate
+    # def set_blob_found(self, is_found): self.found_blob = is_found
+    # def is_blob_found(self): return self.found_blob
 
 def bbrun():
 
@@ -53,29 +53,19 @@ def bbrun():
     signal.signal(signal.SIGINT, signal_handler)
 
     reflectanceSensob = bbc.Sensob(ReflectanceSensors())
-    cameraSensob = bbc.Sensob(Camera())
     sensobs.append(reflectanceSensob)
-    sensobs.append(cameraSensob)
     motob = bbc.Motob(motors)
     bbcon = RobotController(None) # None agent
     # Create the behaviors
     # The behaviors has priorities of 3,3,5,and 1 respectively
     followLineBehavior = FollowLine(bbcon, sensobs[0:1])
-    camera_search_behavior = Camera_search(bbcon, sensobs[1:2])
-    stopFollowingLineBehavior = StopFollowLine(bbcon, sensobs[0:1])
-    wanderBehavior = Wander(bbcon)
 
     bbcon.add_behavior(followLineBehavior)
-    bbcon.add_behavior(stopFollowingLineBehavior)
-    bbcon.add_behavior(wanderBehavior)
-    bbcon.add_behavior(camera_search_behavior)
 
     bbcon.add_motob(motob)
     bbcon.add_sensob(reflectanceSensob)
-    bbcon.add_sensob(cameraSensob)
-
     i = 0
-    while not bbcon.is_blob_found():
+    while not isGoal or i < 50:
           print("Iteration " + str(i))
           i += 1
           print("Found gate: " + str(bbcon.found_gate))
