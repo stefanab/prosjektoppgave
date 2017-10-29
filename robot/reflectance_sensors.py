@@ -2,7 +2,7 @@
 from time import sleep
 import datetime
 import RPi.GPIO as GPIO
-import Motors as motor
+import robot.motors as motor
 
 
 class ReflectanceSensors():
