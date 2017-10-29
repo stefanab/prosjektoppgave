@@ -2,6 +2,7 @@
 from time import sleep
 import datetime
 import RPi.GPIO as GPIO
+import Motors as motor
 
 
 class ReflectanceSensors():
@@ -10,12 +11,11 @@ class ReflectanceSensors():
     # reflectance sensors
     def __init__(self, auto_calibrate=False, min_reading=100, max_reading=1000):
         self.setup()
-        if (auto_calibrate):
+        if not (auto_calibrate):
             # Calibration loop should last ~5 seconds
             # Calibrates all sensors
-            for i in range(5):
-                self.calibrate()
-                sleep(1)
+            self.calibrate()
+                
         else:
             for i in range(len(self.max_val)):
                 self.max_val[i] = max_reading
@@ -44,32 +44,48 @@ class ReflectanceSensors():
         # Set the mode to GPIO.BOARD
         GPIO.setmode(GPIO.BOARD)
 
-
-    def calibrate(self):
+    #Calibrates the motors. If the function is called from outside the motors are used to indicate that the 
+    #robot should be moved for the next calibration.
+    def calibrate(self, motob=None):
         print("calibrating...")
         self.recharge_capacitors()
-
+        
         # GPIO.setup(sensor_inputs, GPIO.IN)
+        print("Put robot on darkest spot...")
+        
         for pin in self.sensor_inputs:
             time = self.get_sensor_reading(pin)
 
             # Get the index from the map
             index = self.sensor_indices[pin]
-
-            # This is the first iteration
-            if (self.max_val[index] == -1):
-                self.max_val[index] = time.microseconds
-                self.min_val[index] = time.microseconds
-            else:
-                # Store the min and max values seen during calibration
-                if (time.microseconds > self.max_val[index]):
-                    self.max_val[index] = time.microseconds
-                elif (time.microseconds < self.min_val[index]):
-                    self.min_val[index] = time.microseconds
-
+             
+            self.min_val[index] = time.microseconds
+                
             # Print the calculated time in microseconds
             print("Pin: " + str(pin))
             print(time.microseconds)
+            
+        if motob:
+            motob.forward(.2)
+        
+        print("now put the robot on the lightest spot")
+        sleep(5)
+        
+        for pin in self.sensor_inputs:
+            time = self.get_sensor_reading(pin)
+
+            # Get the index from the map
+            index = self.sensor_indices[pin]
+            
+            self.max_val[index] = time.microseconds
+                
+            # Print the calculated time in microseconds
+            print("Pin: " + str(pin))
+            print(time.microseconds)
+            
+        
+            
+            
 
     def get_sensor_reading(self, pin):
         GPIO.setup(pin, GPIO.IN)
