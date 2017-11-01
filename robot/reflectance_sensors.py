@@ -9,7 +9,7 @@ class ReflectanceSensors():
     # The constructor allows students to decide if they want to auto_calibrate
     # the robot, or if they want to hard code the min and max readings of the
     # reflectance sensors
-    def __init__(self, auto_calibrate=False, min_reading=100, max_reading=1000):
+    def __init__(self, auto_calibrate=True, min_reading=200, max_reading=2500):
         self.setup()
         if not (auto_calibrate):
             # Calibration loop should last ~5 seconds
@@ -59,6 +59,24 @@ class ReflectanceSensors():
             # Get the index from the map
             index = self.sensor_indices[pin]
              
+            self.max_val[index] = time.microseconds
+                
+            # Print the calculated time in microseconds
+            print("Pin: " + str(pin))
+            print(time.microseconds)
+            
+        if motob:
+            motob.forward(dur=2)
+        
+        print("now put the robot on the lightest spot")
+        sleep(5)
+        self.recharge_capacitors()
+        for pin in self.sensor_inputs:
+            time = self.get_sensor_reading(pin)
+
+            # Get the index from the map
+            index = self.sensor_indices[pin]
+            
             self.min_val[index] = time.microseconds
                 
             # Print the calculated time in microseconds
@@ -66,24 +84,9 @@ class ReflectanceSensors():
             print(time.microseconds)
             
         if motob:
-            motob.forward(.2)
-        
-        print("now put the robot on the lightest spot")
+            motob.forward(dur=2)
+            
         sleep(5)
-        
-        for pin in self.sensor_inputs:
-            time = self.get_sensor_reading(pin)
-
-            # Get the index from the map
-            index = self.sensor_indices[pin]
-            
-            self.max_val[index] = time.microseconds
-                
-            # Print the calculated time in microseconds
-            print("Pin: " + str(pin))
-            print(time.microseconds)
-            
-        
             
             
 

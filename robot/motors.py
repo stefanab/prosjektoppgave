@@ -80,8 +80,8 @@ class Motors():
 
     # Val should be a 2-element vector with values for the left and right motor speeds, both in the range [-1, 1].
     def set_value(self, val,dur=None):
-        left_val = int(self.max * val[0])
-        right_val = int(self.max * val[1])
+        left_val = int(val[0])
+        right_val = int(val[1])
 
         # If we pass negative values to the motors, we need to reverse the direction of the motor
         self.set_left_dir(1) if (left_val < 0) else self.set_left_dir(0)
