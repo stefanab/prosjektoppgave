@@ -54,6 +54,7 @@ class FollowLine(bbc.Behavior):
 		    self.request_halt()
 		
         self.last_value = vSum
+		print(vSum)
 
 		
 
