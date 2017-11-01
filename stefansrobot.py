@@ -23,10 +23,10 @@ class RobotController(bbc.BBCon):
 
     # Getters and setters for determining if the blob has been found
     # which are used by the behaviors
-    # def set_gate_found(self, is_found): self.found_gate = is_found 
-    # def is_gate_found(self): return self.found_gate
-    # def set_blob_found(self, is_found): self.found_blob = is_found
-    # def is_blob_found(self): return self.found_blob
+    def set_gate_found(self, is_found): self.found_gate = is_found 
+    def is_gate_found(self): return self.found_gate
+    def set_blob_found(self, is_found): self.found_blob = is_found
+    def is_blob_found(self): return self.found_blob
 
 def bbrun():
 
@@ -64,12 +64,14 @@ def bbrun():
 
     bbcon.add_motob(motob)
     bbcon.add_sensob(reflectanceSensob)
+    
     i = 0
-    while not isGoal or i < 50:
+    halt_flag = False
+    while not halt_flag and i < 300:
           print("Iteration " + str(i))
           i += 1
-          print("Found gate: " + str(bbcon.found_gate))
-          bbcon.run_one_timestep()
+          
+          halt_flag = bbcon.run_one_timestep()
 
 
     # Called at the end

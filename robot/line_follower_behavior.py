@@ -8,9 +8,9 @@ import math
 class FollowLine(bbc.Behavior):
 
     def __init__(self, bbcon, sensobs=[], trigger=None, act=True, pri=3):
-        self.MAX_SPEED       = 1000
+        self.MAX_SPEED       = 400
         self.num_sensors     = 6
-		self.colors          = [-1, -1, -1, -1, -1, -1]
+	self.colors          = [-1, -1, -1, -1, -1, -1]
         self.alpha           = 0.75
         self.middle_value    = 2500
         self.previous_errors = [0, 0, 0, 0, 0, 0]
@@ -21,6 +21,44 @@ class FollowLine(bbc.Behavior):
 	# Determine if the behavior is currently active or not.  This needs to be subclassed for each behavior.
     def do_activation_test(self): return (not self.bbcon.is_gate_found())
     def do_deactivation_test(self): return self.bbcon.is_gate_found()
+
+    def checkHalt(self):
+		sum = self.sum_colors()
+		match = 0
+                print("sum")
+                print(sum)
+		if sum == 6:
+                    print("all white")
+		    return True
+		
+		
+		if(sum == 3):
+		    first_color = self.colors[0]
+		    if(first_color == 0):
+			match = 1
+			excpected = 1
+			while(self.colors[match] == excpected and match < 6):
+			    match += 1
+			    if(excpected == 0):
+                                excpected = 1
+                            else:
+                                excpeted = 0
+			
+		    elif(first_color == 1):
+			match = 1
+			excpected = 0
+			while(self.colors[match] == excpected and match < 6):
+			    match += 1
+			    if(excpected == 0):
+                                excpected = 1
+                            else:
+                                excpeted = 0
+		
+		if(match == 6):
+                    print("match!")
+		    return True
+			
+		return False
 
     # This is the core method for behavior computation; it needs to be subclassed.
     # It's main jobs are a) read sensors, b) update the behavior's match_degree, c) set the motor requests.
@@ -38,68 +76,44 @@ class FollowLine(bbc.Behavior):
         onLine = 0
 		
         for i in range(len(values)):
-			if(i < len(values)/2):
+	    if(i < len(values)/2):
                 valueLeft  = values[i]
-			    valueRight = values[len(values)-1-i]
-                vSum += (valueLeft - valueRight ) * (10/i) * 100 
+		valueRight = values[len(values)-1-i]
+                vSum += (valueLeft - valueRight ) * (10000/(100*i+1))  
 			
-			if(values[i] < 0.07): self.colors[i] = 0
+	    if(values[i] < 0.7): self.colors[i] = 0
 			    
-			else if(values[i] > 0.93): self.colors[i] = 1
+	    elif(values[i] > 0.90): self.colors[i] = 1
 			
-			else: self.colors[i] = -1
+	    else: self.colors[i] = 0
 
-
-		if(checkHalt()):
-		    self.request_halt()
-		
+        print(self.colors)
+	if(self.checkHalt()):
+            print("requesting halt")
+	    self.request_halt()
+        else:
+            print("no halt")
         self.last_value = vSum
-		print(vSum)
 
+        print(vSum)
 		
 
         # Use the self.last_value to determine what the motors should be set two
         return self.set_motors()
 
-	def checkHalt():
-		sum = sum_colors
-		if sum == 6:
-		    return True
-		
-		
-		if(sum == 3):
-		    first_color = self.colors[0]
-			if(first_color == 0):
-			    match = 1
-			    excpected = 1
-			    while(self.colors[match] == excpected and match < 6):
-			        match += 1
-					excpected = 0 if excpeted == 1 else: excpected = 1
-			
-			else if(first_color == 1):
-			    match = 1
-			    excpected = 0
-			    while(self.colors[match] == excpected and match < 6):
-			        match += 1
-					excpected = 0 if excpeted == 1 else: excpected = 1
-		
-		
-		if(match == 6):
-		    return True
-			
-		return False
+	
 		
     def set_motors(self):
         # Our "error" is how far we are away from the center of the line, which
         # corresponds to position 2500.
         #error = self.last_value - self.middle_value; 
-		print("line location: " + str(self.last_value))
-		# dark values are lower than light ones. Negative values means that there was more "Dark" on the left side.
-		# Means we should turn left
+	print("line location: " + str(self.last_value))
+	# dark values are lower than light ones. Negative values means that there was more "Dark" on the left side.
+	# Means we should turn left
 
 
-	    m1_speed = (self.MAX_SPEED + self.last_value)/4; # Divide by 4 so the robot doesn't go to fast
-        m2_speed = (self.MAX_SPEED - self.last_value)/4;
+	m1_speed = (self.MAX_SPEED + self.last_value)/2; # Divide by 4 so the robot doesn't go to fast
+        m2_speed = (self.MAX_SPEED - self.last_value)/2;
         #  Get motor speed difference using proportional and derivative PID terms
         #  (the integral term is generally not very useful for line following).
         #  Here we are using a proportional constant of 1/4 and a derivative
@@ -139,18 +153,18 @@ class FollowLine(bbc.Behavior):
 
         # If error is maximum (2500) then this motor request becomes essential for us to continue
         # following the line
-        match_degree = math.abs(self.last_value)
+        match_degree = abs(self.last_value)
         self.set_match_degree(match_degree)
 
         # Set the motor_requests to be m1_speed and m2_speed
         self.set_motor_requests([int(m1_speed), int(m2_speed)])
 
-	def sum_colors(self):
-	    sum = 0
-		for i in range(len(self.colors)):
-		    sum += self.colors[i]
+    def sum_colors(self):
+	sum = 0
+	for i in range(len(self.colors)):
+	    sum += self.colors[i]
 			
-		return sum
+	return sum
 		
     def sum_weighted_errors(self, error):
         error_sum = 0

@@ -45,7 +45,7 @@ class BBCon():
         if not(halt_flag): self.update_motors(action)
         time.sleep(self.timestep_duration) # Allows current action to run this long
         for s in self.sensobs: s.reset()
-        return not(halt_flag)
+        return halt_flag
 
     def timestep_loop(self):
         while self.run_one_timestep():
