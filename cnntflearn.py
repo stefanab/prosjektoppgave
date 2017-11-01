@@ -15,7 +15,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 train_x, train_y, test_x, test_y = create_feature_sets_and_labels('posbat','neg')
 n_classes = 2
 n_epochs = 1000
-#batch_size = 100
+batch_size = 200
 l_rate = 0.01
 
 
@@ -31,16 +31,16 @@ test_x = test_x.reshape([-1, 128, 96, 3])
 
 convnet = input_data(shape=[None, 128, 96, 3], name='input')
 
-convnet = conv_2d(convnet, 60, 2, activation='relu')
-convnet = max_pool_2d(convnet, 2)
+convnet = conv_2d(convnet, 32, 8, stride=4, activation='relu')
+#convnet = max_pool_2d(convnet, 2)
 
-convnet = conv_2d(convnet, 40, 2, activation='relu')
-convnet = max_pool_2d(convnet, 2)
+convnet = conv_2d(convnet, 64, 4, stride=2, activation='relu')
+#convnet = max_pool_2d(convnet, 2)
 
-convnet = conv_2d(convnet, 20, 2, activation='relu')
-convnet = max_pool_2d(convnet, 2)
+convnet = conv_2d(convnet, 64, 3, stride=1 activation='relu')
+#convnet = max_pool_2d(convnet, 2)
 
-convnet= fully_connected(convnet, 30, activation='relu')
+convnet= fully_connected(convnet, 512, activation='relu')
 convnet = dropout(convnet, .8)
 
 convnet = fully_connected(convnet, n_classes, activation='softmax')
@@ -52,6 +52,6 @@ model = tflearn.DNN(convnet)
 if(len(sys.argv) > 1):
 	model.load(sys.argv[1])
 #writer = tflearn.train.SummaryWriter(logs_path, graph=tf.get_default_graph())
-model.fit({'input': train_x}, {'targets': train_y}, n_epoch=n_epochs, validation_set=({'input': test_x}, {'targets': test_y}), snapshot_epoch=100, snapshot_step=100, show_metric=False, run_id='image_test')
+model.fit({'input': train_x}, {'targets': train_y}, n_epoch=n_epochs, validation_set=({'input': test_x}, {'targets': test_y}), snapshot_epoch=100, snapshot_step=100, show_metric=True, run_id='image_test')
 
 model.save('tflearncnn.model')
