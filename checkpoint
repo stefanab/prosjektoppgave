@@ -1,2 +1,2 @@
-model_checkpoint_path: "C:\\Users\\Stefan\\Desktop\\NTNU\\prosjektoppgave\\prosjektoppgave\\tflearncnn.model"
-all_model_checkpoint_paths: "C:\\Users\\Stefan\\Desktop\\NTNU\\prosjektoppgave\\prosjektoppgave\\tflearncnn.model"
+model_checkpoint_path: "C:\\Users\\Stefan\\Desktop\\NTNU\\prosjektoppgave\\prosjektoppgave\\tflearncnnBattery.model"
+all_model_checkpoint_paths: "C:\\Users\\Stefan\\Desktop\\NTNU\\prosjektoppgave\\prosjektoppgave\\tflearncnnBattery.model"
