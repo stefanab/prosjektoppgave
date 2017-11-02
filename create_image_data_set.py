@@ -8,11 +8,26 @@ import glob
 
 def load_images(folder, classification):
     image_feature_list = []
+    printed = False
     for image in glob.glob(folder +'/*'):
         
         im = np.array(Image.open(image), dtype=np.uint8)
-        
+        if not printed:
+            print(im.shape)
+            printed = True
         image_feature_list.append([im, classification])
+
+        
+    return image_feature_list
+    
+    
+def load_examples(folder, classification):
+    image_feature_list = []
+    
+        
+    for i in range(1000):
+        
+        image_feature_list.append([classification, classification])
         
     return image_feature_list
     
