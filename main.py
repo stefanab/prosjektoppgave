@@ -18,6 +18,7 @@ def main():
     imgPars   = constantParametersImage()
     camera    = Camera(width=imgPars.width, height=imgPars.height)
     camera.sensor_get_value()
+	
     motors    = Motors()
     infrared  = ReflectanceSensors()
     infrared.calibrate()
