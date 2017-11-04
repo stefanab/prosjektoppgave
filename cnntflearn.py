@@ -39,7 +39,9 @@ train_y = train_y.reshape([-1, 2])
 train_x = train_x.reshape([-1, shape[0], shape[1], shape[2]])
 test_x = test_x.reshape([-1, shape[0], shape[1], shape[2]])
 
-
+##def create_conv_net(network_parameters):
+##    shape = network_parameters.shape
+##    n_classes = network_parameters.n
 convnet = input_data(shape=[None, shape[0], shape[1], shape[2]], name='input')
 
 convnet = conv_2d(convnet, 32, 8, strides=4, activation='relu')

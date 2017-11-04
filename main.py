@@ -5,11 +5,12 @@ from time import sleep
 import signal
 import sys
 from robot.motors import Motors
+from robot.camera import Camera
 from robot.reflectance_sensors import ReflectanceSensors
 from constparimg import constantParametersImage
 
 def cleanUp():
-    motors.stop()
+    #motors.stop()
     GPIO.cleanup()
     sys.exit(0)
 
@@ -18,17 +19,17 @@ def main():
     imgPars   = constantParametersImage()
     camera    = Camera(width=imgPars.width, height=imgPars.height)
     camera.sensor_get_value()
-	
-    motors    = Motors()
-    infrared  = ReflectanceSensors()
-    infrared.calibrate()
-    infrared.update()
+    find_object = FindObject( , [camera])	
+    #motors    = Motors()
+    #infrared  = ReflectanceSensors()
+    #infrared.calibrate()
+    #infrared.update()
     sleep(5)
     print("setup")
         
     # To exit the program properly on keyboardinterrupt
     def signal_handler(signal, frame):
-        motors.stop()
+        #motors.stop()
         GPIO.cleanup()
         sys.exit(0)
        
@@ -43,7 +44,7 @@ def main():
         # infrared.update()
         # sleep(1)
         # iteration += 1
-    motors.stop()
+    #motors.stop()
     GPIO.cleanup()
 ##    
     
