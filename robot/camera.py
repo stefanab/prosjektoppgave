@@ -1,14 +1,15 @@
-import os
+import os, io
 from PIL import Image
 import picamera as picam
+import numpy as np
 
 class Camera():
 
-    def __init__(self, img_width=128, img_height=96, img_rot=0):
-		self.camera     = picam.PiCamera(resolution=(img_width,img_height))
+    def __init__(self, width=128, height=96, img_rot=0):
+	self.camera     = picam.PiCamera(resolution=(width, height))
         self.value      = None
-        self.img_width  = img_width
-        self.img_height = img_height
+        self.width  = width
+        self.height = height
         self.img_rot    = img_rot
 
     def get_value(self):  return self.value
@@ -21,9 +22,14 @@ class Camera():
         self.value = None
 
     def sensor_get_value(self):
-        
-        self.value = self.camera.capture()
-		print(self.value)
+        stream = io.BytesIO()
+        self.value = self.camera.capture(stream, format='jpeg')
+	print(self.value)
+	stream.seek(0)
+	
+	print(self.value)
+	im = np.array(Image.open(stream), dtype=np.uint8)
+	print(im)
         # Open the image just taken by raspicam
         # Stores the RGB array in the value field
         #self.value = Image.open('image.png').convert('RGB')

@@ -11,6 +11,7 @@ from robot.line_follower_behavior import FollowLine
 from robot.camera_search_behavior import Camera_search
 from robot.stop_follow_line_behavior import StopFollowLine
 from robot.wander_behavior import Wander
+from findobj_behavior import FindObject
 
 # Sub class for a BBCon where objectives can be specified specified
 class RobotController(bbc.BBCon):
@@ -53,17 +54,21 @@ def bbrun():
     signal.signal(signal.SIGINT, signal_handler)
 
     reflectanceSensob = bbc.Sensob(ReflectanceSensors())
+    cameraSensob      = bbc.Sensob(Camera())
     sensobs.append(reflectanceSensob)
+    sensobs.append(cameraSensob)
     motob = bbc.Motob(motors)
     bbcon = RobotController(None) # None agent
     # Create the behaviors
     # The behaviors has priorities of 3,3,5,and 1 respectively
     followLineBehavior = FollowLine(bbcon, sensobs[0:1])
-
+    findObjectBehavior = FindObject(bbcon, sensobs[1:2])	
     bbcon.add_behavior(followLineBehavior)
-
+    bbcon.add_behavior(findObjectBehavior)
+    
     bbcon.add_motob(motob)
     bbcon.add_sensob(reflectanceSensob)
+    bbcon.add_sensob(cameraSensob)
     
     i = 0
     halt_flag = False
