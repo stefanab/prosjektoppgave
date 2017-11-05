@@ -24,13 +24,14 @@ class Camera():
     def sensor_get_value(self):
         stream = io.BytesIO()
         self.value = self.camera.capture(stream, format='jpeg')
-	print(self.value)
-	stream.seek(0)
-	
-	print(self.value)
-	im = np.array(Image.open(stream), dtype=np.uint8)
-	print(im)
+	    print(self.value)
+	    stream.seek(0)
+
+        print(self.value)
+	    im = np.array(Image.open(stream), dtype=np.uint8)
+	    print(im)
+        self.value = im
+        stream.close()
         # Open the image just taken by raspicam
         # Stores the RGB array in the value field
         #self.value = Image.open('image.png').convert('RGB')
-

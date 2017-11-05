@@ -16,7 +16,7 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 constantsImg = constantParametersImage()
 constantsNet = constantParametersNetwork()
 
-	
+
 train_x, train_y, test_x, test_y = create_feature_sets_and_labels('posBat','negBat')
 
 print(len(train_y[0]))
@@ -62,9 +62,11 @@ convnet = regression(convnet, optimizer='adam', batch_size=b_size, learning_rate
 
 model = tflearn.DNN(convnet)
 
+
+
 if(len(sys.argv) > 1):
 	model.load(sys.argv[1])
-	
+
 for target in test_y:
     print(target)
 
