@@ -51,10 +51,10 @@ class ReflectanceSensors():
 
     #Calibrates the motors. If the function is called from outside the motors are used to indicate that the
     #robot should be moved for the next calibration.
-    def calibrate(self, motob=None):
+    def calibrate(self, motob=None, forward_dur=0, sleep_dur=8):
         print("calibrating...")
         self.recharge_capacitors()
-        iter = 3
+        iter = 1
 
         # GPIO.setup(sensor_inputs, GPIO.IN)
         print("Put robot on darkest spot...")
@@ -73,7 +73,7 @@ class ReflectanceSensors():
                 print(time.microseconds)
 
                 if motob:
-                motob.forward(dur=.3)
+                    motob.forward(forward_dur)
 
         if motob:
             motob.stop()
@@ -81,7 +81,7 @@ class ReflectanceSensors():
         self.max_val = min_max_value
 
         print("now put the robot on the lightest spot")
-        sleep(8)
+        sleep(sleep_dur)
         self.recharge_capacitors()
         max_min_value = [-1, -1, -1, -1, -1, -1]
         for i in range(iter):
@@ -99,12 +99,12 @@ class ReflectanceSensors():
                 print(time.microseconds)
 
                 if motob:
-                motob.forward(dur=.3)
+                    motob.forward(forward_dur)
 
         if motob:
             motob.stop()
         self.min_val = max_min_value
-        sleep(8)
+        sleep(sleep_dur)
 
 
 
@@ -140,7 +140,7 @@ class ReflectanceSensors():
     # the amount of reflectance picked up by each one.  A high reflectance (near 1) indicates a LIGHT surface, while
     # a value near 0 indicates a DARK surface.
     # return a np.array which is the needed format or tf
-    def get_value(self, discrete=True, debug=True):
+    def get_value(self, discrete=True, debug=False):
         if not discrete:
             return np.array(self.value)
         else:
@@ -155,7 +155,7 @@ class ReflectanceSensors():
                 print("discrete values")
                 print(values)
                 print("sonsor values")
-                print(self.values)
+                print(self.value)
             values = np.array(values)
             return values
 
@@ -177,7 +177,7 @@ class ReflectanceSensors():
     # Uses the calibrated min and maxs for each sensor to return a normalized
     # value for the @param sensor_time for the given @param index
     def normalize(self, index, sensor_time):
-        print("normalize")
+        
         normalized_value = float(sensor_time - self.min_val[index]) / (self.max_val[index] - self.min_val[index])
         if (normalized_value > 1.0):
             return 1.0

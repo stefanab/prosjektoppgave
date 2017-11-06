@@ -1,4 +1,4 @@
-import rewardfunction.RewardFunction
+from rewardfunction import RewardFunction
 from robot.reflectance_sensors import ReflectanceSensors
 
 # Calculates the rewards for each action in a state
@@ -18,10 +18,10 @@ from robot.reflectance_sensors import ReflectanceSensors
 # If the previous state was a all black state, the reward for finding
 # a new all black state (essentially doing stop in all black state)
 # is negative -20
-def LineFollowerRewardFunction(RewardFunction):
+class LineFollowerRewardFunction(RewardFunction):
 
     def __init__(self, name, reflectance_sensors):
-        RewardFunction.__init__(name)
+        RewardFunction.__init__(self, name)
         self.reflectance_sensors = reflectance_sensors
 
 
@@ -31,13 +31,17 @@ def LineFollowerRewardFunction(RewardFunction):
     def calculate_reward(self, state):
 
         sum_white = 0
+        
         for reading in state:
-            if reading is 1:
+            print(reading)
+            if reading == 1:
                 sum_white += 1
-
-        if sum_white is 6:
+        print("sum White")
+        print(sum_white)
+        if sum_white ==  6:
+            print("is final")
             return -50, True
-        elif sum_white is 0:
+        elif sum_white == 0:
             return 10, False
         else:
             return 0, False
