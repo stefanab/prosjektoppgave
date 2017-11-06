@@ -27,14 +27,18 @@ def conv_neural_network_model1(shape=None, imconstpar=constantParametersImage(),
     convnet = regression(convnet, optimizer='SGD', loss='categorical_crossentropy', name='targets')
 
     model = tflearn.DNN(convnet)
+    
+    return model
 
 def reflectance_neural_network_model(shape=[None, 1, 6, 1]):
     ref = input_data(shape=shape, name='input')
     ref = fully_connected(ref, 64, activation='relu')
-    convnet = dropout(convnet, .8)
+    ref = dropout(ref, .8)
 
-    convnet = fully_connected(convnet, 8, activation='softmax')
+    ref = fully_connected(ref, 8, activation='softmax')
 
-    convnet = regression(convnet, optimizer='sgd', loss='categorical_crossentropy', name='targets')
+    ref = regression(ref, optimizer='sgd', loss='categorical_crossentropy', name='targets')
 
-    model = tflearn.DNN(convnet)
+    model = tflearn.DNN(ref)
+    
+    return model

@@ -1,4 +1,4 @@
-from robot.motors import Motors()
+from robot.motors import Motors
 
 
 

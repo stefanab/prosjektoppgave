@@ -68,7 +68,7 @@ class ModelHandler():
                 model.save(name)
 
             ## Sjekk om en fil allerede finnes
-            ## Dersom navnet finnes bruk modelfile til å hente neste nummer
+            ## Dersom navnet finnes bruk modelfile til a hente neste nummer
             ## som garantert ikke er brukt og lag en ny fil med inkrementert verdi
             ## Lagre netverksmodellen som med model.save
         else:

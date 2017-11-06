@@ -2,8 +2,7 @@
 
 
 
-
-def RewardFunction():
+class RewardFunction():
 
     def __init__(self, name):
         self.name            = name
@@ -18,4 +17,4 @@ def RewardFunction():
 
     # Should calculate the reward given the current state, action (and)
     # possibly previous state
-    def calculate_reward(self, state, action): return reward
+    def calculate_reward(self, state, action): return reward, is_final_state
