@@ -14,7 +14,7 @@ class ReflectanceSensors():
     # While light spots will have shorter reflectance time
     # However, this is changed in code so that light spots will have
     # a value closer to 1, while dark spots have values closer to 0
-    def __init__(self, auto_calibrate=False, motob=None, min_reading=200, max_reading=2500):
+    def __init__(self, auto_calibrate=False, motob=None, min_reading=200, max_reading=2000):
         self.setup()
         if not (auto_calibrate):
             # Calibration loop should last ~5 seconds
