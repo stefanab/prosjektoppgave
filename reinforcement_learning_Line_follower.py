@@ -33,50 +33,51 @@ def __main__():
         GPIO.cleanup()
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
-    
+
     discount_factor = 0.8
     motors = Motors()
     reflectance_sensors = ReflectanceSensors(motob=motors, auto_calibrate=True)
     reward_function = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
     action_executor = RobotActionExecutor(motors)
-    q_net = reflectance_neural_network_model2()
+    q_net = reflectance_neural_network_model2(n_actions=action_executor.n_actions)
     modelh = ModelHandler()
-    
+
     # check if we want to load some previous model or start
     # with a fresh one
     if(len(sys.argv) > 1):
     	modelh.load(sys.argv[1], q_net)
-    
+
     q_dash = q_net
-    
-    
-    
-    
-    
+
+
+
+
+
     #train_y = train_y.reshape([-1, 2])
-    episodes = 20 
+    episodes = 20
+    sec_cd = 5
     experience = []
     for i in range(episodes): # epiode for loop
         print("get ready for the next episode(" + str(i) + ")...")
-        for sec in range(7):
-            print(6-sec)
+        for sec in range(sec_cd):
+            print(sec_cd+1-sec)
             sleep(1)
         is_final_state = False
         step = 0
         reflectance_sensors.update()
         updated_state = reflectance_sensors.get_value()
-        
+
         while step < 100 and not (is_final_state): #main while loop
             # Store current state
-            action = 4
+            action = -1
             print("step " + str(step))
             current_state = updated_state
-            
+
 
             # Chose action randomly or pick best action
             if(rdm.random() > .9):
-                
-                action = rdm.randint(0,7)
+
+                action = rdm.randint(0,action_executor.n_actions-1)
             else:
                 q_values = q_net.predict(current_state.reshape([-1, 1, 6, 1]))
                 print("q_values for actions are:")
@@ -97,7 +98,7 @@ def __main__():
             step += 1
             reflectance_sensors.update()
             updated_state = reflectance_sensors.get_value()
-            
+
 
             # Store transition of (current_state, action, reward, updated_state)
             # Change to append if you want to store all experiences
@@ -136,7 +137,7 @@ def __main__():
             targets = q_net.predict(chosen_experience[0].reshape([-1, 1, 6, 1]))
             # print("targets")
             # print(targets)
-            
+
             targets[0, chosen_experience[1]] = yk
                 # Set target value for chosen action equal to yk minus the q_values
                 #predicted by net and s
@@ -145,23 +146,23 @@ def __main__():
                 # Square this value
 
                 # update q_net
-               
+
             q_net.fit(chosen_experience[0].reshape([-1, 1, 6, 1]), targets, n_epoch=1)
-           
+
             # if enough time as passed set Q-dash to current q_net
             if(step % 1 == 0):
                 q_dash = q_net
 
         #end main while
     #end episode for loop
-    
-    
+
+
     motors.stop()
-    
+
     modelh.save("reflectance_reinforcement2.model", q_net, overwrite=True)
     GPIO.cleanup()
     sys.exit(0)
-    
+
     print("done")
 
 
