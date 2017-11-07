@@ -31,8 +31,6 @@ class LineFollowerRewardFunction(RewardFunction):
     def calculate_reward(self, state, action):
         reward = 0
         sum_white = 0
-        if((not state[2]) or (not state[3])):
-            reward += 1
         for reading in state:
             print(reading)
             if reading == 1:
@@ -41,7 +39,7 @@ class LineFollowerRewardFunction(RewardFunction):
         print(sum_white)
         if sum_white ==  6:
             print("is final")
-            return reward - 100, True
+            return reward - 50, True
         elif sum_white == 0:
             return reward + 1, False
         else:
