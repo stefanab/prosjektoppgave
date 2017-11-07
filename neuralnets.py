@@ -42,3 +42,27 @@ def reflectance_neural_network_model(shape=[None, 1, 6, 1]):
     model = tflearn.DNN(ref)
     
     return model
+
+def reflectance_neural_network_model3(shape=[None, 1, 18, 1]):
+    ref = input_data(shape=shape, name='input')
+    ref = fully_connected(ref, 32, activation='relu')
+    ref = dropout(ref, .8)
+
+    ref = fully_connected(ref, 8, activation='softmax')
+
+    ref = regression(ref, optimizer='adam', loss='categorical_crossentropy', name='targets')
+
+    model = tflearn.DNN(ref)
+    
+    return model
+
+def reflectance_neural_network_model2(shape=[None, 1, 6, 1]):
+    ref = input_data(shape=shape, name='input')
+
+    ref = fully_connected(ref, 8, activation='softmax')
+
+    ref = regression(ref, optimizer='sgd', loss='categorical_crossentropy', name='targets')
+
+    model = tflearn.DNN(ref)
+    
+    return model

@@ -28,10 +28,11 @@ class LineFollowerRewardFunction(RewardFunction):
     # Method to calculate rewards based on actions taken
     # state the discrete colors of the state currrently in.
     # Also return whether this state is final
-    def calculate_reward(self, state):
-
+    def calculate_reward(self, state, action):
+        reward = 0
         sum_white = 0
-        
+        if((not state[2]) or (not state[3])):
+            reward += 1
         for reading in state:
             print(reading)
             if reading == 1:
@@ -40,8 +41,8 @@ class LineFollowerRewardFunction(RewardFunction):
         print(sum_white)
         if sum_white ==  6:
             print("is final")
-            return -50, True
+            return reward - 100, True
         elif sum_white == 0:
-            return 10, False
+            return reward + 1, False
         else:
-            return 0, False
+            return reward + 0, False
