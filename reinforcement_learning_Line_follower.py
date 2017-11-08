@@ -87,7 +87,7 @@ def __main__():
 
             # Chose action randomly or pick best action
             was_random = True
-            if(rdm.random() > .9 and False):
+            if(rdm.random() > .9 and training):
 
                 action = rdm.randint(0,action_executor.n_actions-1)
             else:
