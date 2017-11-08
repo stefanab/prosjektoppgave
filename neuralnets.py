@@ -54,7 +54,7 @@ def conv_neural_network_model1(name="conv_neural_network_model1", shape=None, im
 
     return model
 
-def conv_reflectance_neural_network_model1(n_actions=3, name="conv_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
+def conv_reflectance_neural_network_model1(n_actions=3, name="conv_ref_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
     convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
     reflectance = tflearn.input_data(shape=[None, 1, 6, 1], name="reflectance_input")
