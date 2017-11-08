@@ -9,11 +9,12 @@ from robot.motors import Motors
 from filehandle.modelHandler import ModelHandler
 from line_follower_reward_function import LineFollowerRewardFunction
 from neuralnets import reflectance_neural_network_model2
+import neuralnets
 from robot_actions import RobotActionExecutor
 import tflearn
 import tensorflow as tf
 from rewardfunction import RewardFunction
-
+import constparimg as cp
 
 def pick_best_action(q_values_matrix):
     q_values = q_values_matrix[0]
@@ -35,11 +36,17 @@ def __main__():
     signal.signal(signal.SIGINT, signal_handler)
 
     discount_factor = 0.8
+
     motors = Motors()
+    camera = Camera()
     reflectance_sensors = ReflectanceSensors(motob=motors, auto_calibrate=True)
-    reward_function = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
-    action_executor = RobotActionExecutor(motors)
-    q_net = reflectance_neural_network_model2(n_actions=action_executor.n_actions)
+
+    constant            = cpi.constantParametersImage()
+
+    reward_function     = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
+    action_executor     = RobotActionExecutor(motors)
+    q_net, name         = neuralnets.conv_reflectance_neural_network_model1(n_actions=action_executor.n_actions)
+
     modelh = ModelHandler()
 
     # check if we want to load some previous model or start
@@ -66,26 +73,29 @@ def __main__():
         is_final_state = False
         step = 0
         reflectance_sensors.update()
-        updated_state = reflectance_sensors.get_value()
+        updated_ref_state = reflectance_sensors.get_value()
+        camera.update()
+        updated_cam_state = camera.get_value()
 
         while step < max_step and not (is_final_state): #main while loop
             # Store current state
             action = -1
             print("step " + str(step))
             print(updated_state)
-            current_state = updated_state
+            current_ref_state = updated_ref_state
+            current_cam_state = updated_cam_state
 
             # Chose action randomly or pick best action
             was_random = True
             if(rdm.random() > .9 and False):
-    
+
                 action = rdm.randint(0,action_executor.n_actions-1)
             else:
-                q_values = q_net.predict(current_state.reshape([-1, 1, 6, 1]))
+                q_values = q_net.predict({'reflectance_input': current_ref_state.reshape([-1, 1, 6, 1])}, {'image_input': current_cam_state.reshape([-1, constant.height, constant.width, constant.channels])})
                 print("q_values for actions are:")
                 print(q_values)
                 was_random = False
-                action = pick_best_action(q_values)
+                action = np.argmax(q_values)
 
 
             # get reward for current state
@@ -96,15 +106,15 @@ def __main__():
             sleep(0.051)
             motors.stop()
             step += 1
-            
-            reflectance_sensors.update()
-            
-            updated_state = reflectance_sensors.get_value()
 
+            reflectance_sensors.update()
+            camera.update()
+            updated_ref_state = reflectance_sensors.get_value()
+            updated_cam_state = camera.get_value()
 
             # Store transition of (current_state, action, reward, updated_state)
             # Change to append if you want to store all experiences
-            experience.append([current_state, action, reward, updated_state, is_final_state])
+            experience.append([current_ref_state, action, reward, updated_ref_state, is_final_state, current_cam_state, updated_cam_state])
 
             # Select a mini-batch of transitions to train on
             chosen_experience = None
@@ -114,28 +124,30 @@ def __main__():
                 chosen_experience = experience[rdm.randint(0, len(experience)-1)]
             # Set target, yk, as rk if terminal state or as rk + max(Q-dash)
             yk = 0
-            
+
             if(chosen_experience[4]):
                 yk = chosen_experience[2]
             else:
-                prediction_matrix = q_dash.predict(chosen_experience[3].reshape([-1, 1, 6, 1]))
-                
-                
+                prediction_matrix = q_dash.predict(
+                {'reflectance_input': chosen_experience[3].reshape([-1, 1, 6, 1])},
+                {'image_input': chosen_experience[6].reshape([-1, constant.height, constant.width, constant.channels])}
+                )
                 prediction = prediction_matrix[0]
-                max_q_updated_state = prediction[0]
-                for value in prediction:
-                    if value > max_q_updated_state:
-                        max_q_updated_state = value
+                max_q_updated_state = np.amax(prediction)
+
 
                 yk = chosen_experience[2] + discount_factor * max_q_updated_state
-            
-            
+
+
             print("yk")
             print(yk)
             # train network
                 # Predict network and set all target labels for non-chosen action
                 # equal to prediction
-            targets = q_net.predict(chosen_experience[0].reshape([-1, 1, 6, 1]))
+            targets = q_net.predict(
+            {'reflectance_input': chosen_experience[0].reshape([-1, 1, 6, 1])},
+            {'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
+            )
             # print("targets")
             # print(targets)
 
@@ -149,8 +161,10 @@ def __main__():
                 # update q_net
             if(i <= 0 and step <= 1):
                 motors.stop()
-            q_net.fit(chosen_experience[0].reshape([-1, 1, 6, 1]), targets, n_epoch=1)
-
+            q_net.fit(
+            {'reflectance_input': chosen_experience[0].reshape([-1, 1, 6, 1])},
+            {'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
+            ,targets, n_epoch=1)
             # if enough time as passed set Q-dash to current q_net
             if(step % 1 == 0):
                 q_dash = q_net
@@ -161,7 +175,7 @@ def __main__():
 
     motors.stop()
 
-    modelh.save("3act_reinforcement22.model", q_net, overwrite=True)
+    modelh.save(name + ".model", q_net)
     GPIO.cleanup()
     sys.exit(0)
 

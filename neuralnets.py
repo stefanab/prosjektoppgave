@@ -27,7 +27,7 @@ def conv_neural_network_model(name="conv_neural_network_model", imconstpar=const
     convnet = regression(convnet, optimizer='adam', loss='categorical_crossentropy', name='targets')
 
     model = tflearn.DNN(convnet)
-    
+
     return model
 
 def conv_neural_network_model1(name="conv_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
@@ -54,7 +54,7 @@ def conv_neural_network_model1(name="conv_neural_network_model1", shape=None, im
 
     return model
 
-def conv_reflectance_neural_network_model1(n_actions=5, name="conv_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
+def conv_reflectance_neural_network_model1(n_actions=3, name="conv_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
     convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
     reflectance = tflearn.input_data(shape=[None, 1, 6, 1], name="reflectance_input")
@@ -69,10 +69,10 @@ def conv_reflectance_neural_network_model1(n_actions=5, name="conv_neural_networ
     #convnet = max_pool_2d(convnet, 2)
 
 
-    convnet= fully_connected(convnet, 512, activation='relu', name='fc1')
+    convnet= fully_connected(convnet, 256, activation='relu', name='fc1')
     convnet = dropout(convnet, .8)
 
-    convnet = fully_connected(convnet, 2, activation='softmax', name='fc2')
+    convnet = fully_connected(convnet, 8, activation='softmax', name='fc2')
 
     merged_net = merge([convnet, reflectance], mode='concat', axis=0)
     #convnet = regression(convnet, optimizer='SGD', loss='categorical_crossentropy', name='targets')
@@ -81,7 +81,7 @@ def conv_reflectance_neural_network_model1(n_actions=5, name="conv_neural_networ
     merged_net = regression(merged_net, optimizer='adam', loss='categorical_crossentropy', name='targets')
     model = tflearn.DNN(merged_net)
 
-    return model
+    return model, name
 
 def reflectance_neural_network_model(name="reflectance_neural_network_model", n_actions=5, shape=[None, 1, 6, 1]):
     ref = input_data(shape=shape, name='input')
