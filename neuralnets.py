@@ -24,10 +24,11 @@ def conv_neural_network_model(name="conv_neural_network_model", imconstpar=const
 
     convnet = fully_connected(convnet, 2, activation='softmax')
 
-    convnet = regression(convnet, optimizer='adam', batch_size=b_size, learning_rate=l_rate, loss='categorical_crossentropy', name='targets')
+    convnet = regression(convnet, optimizer='adam', loss='categorical_crossentropy', name='targets')
 
     model = tflearn.DNN(convnet)
-
+    
+    return model
 
 def conv_neural_network_model1(name="conv_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
