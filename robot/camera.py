@@ -24,15 +24,18 @@ class Camera():
     def reset(self):
         self.value = None
 
+    def close(self):
+        self.camera.close()
+
     def sensor_get_value(self):
         stream = io.BytesIO()
         self.value = self.camera.capture(stream, format='jpeg')
-        
+
         stream.seek(0)
 
-        
+
         im = np.array(Image.open(stream), dtype=np.uint8)
-        
+
         self.value = im
         stream.close()
         # Open the image just taken by raspicam

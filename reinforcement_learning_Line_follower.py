@@ -68,6 +68,7 @@ def __main__():
     max_step = 10000
     sec_cd = 5
     experience = []
+    training = True
     for i in range(episodes): # epiode for loop
         motors.stop()
         print("get ready for the next episode(" + str(i) + ")...")
@@ -114,63 +115,63 @@ def __main__():
             camera.update()
             updated_ref_state = reflectance_sensors.get_value()
             updated_cam_state = camera.get_value()
-
             # Store transition of (current_state, action, reward, updated_state)
             # Change to append if you want to store all experiences
-            experience.append([current_ref_state, action, reward, updated_ref_state, is_final_state, current_cam_state, updated_cam_state])
+            if(training):
+                experience.append([current_ref_state, action, reward, updated_ref_state, is_final_state, current_cam_state, updated_cam_state])
 
-            # Select a mini-batch of transitions to train on
-            chosen_experience = None
-            if is_final_state:
-                chosen_experience = experience[len(experience)-1]
-            else:
-                chosen_experience = experience[rdm.randint(0, len(experience)-1)]
-            # Set target, yk, as rk if terminal state or as rk + max(Q-dash)
-            yk = 0
+                # Select a mini-batch of transitions to train on
+                chosen_experience = None
+                if is_final_state:
+                    chosen_experience = experience[len(experience)-1]
+                else:
+                    chosen_experience = experience[rdm.randint(0, len(experience)-1)]
+                # Set target, yk, as rk if terminal state or as rk + max(Q-dash)
+                yk = 0
 
-            if(chosen_experience[4]):
-                yk = chosen_experience[2]
-            else:
-                prediction_matrix = q_dash.predict(
-                {'reflectance_input': chosen_experience[3].reshape([-1, 6]),
-                'image_input': chosen_experience[6].reshape([-1, constant.height, constant.width, constant.channels])}
+                if(chosen_experience[4]):
+                    yk = chosen_experience[2]
+                else:
+                    prediction_matrix = q_dash.predict(
+                    {'reflectance_input': chosen_experience[3].reshape([-1, 6]),
+                    'image_input': chosen_experience[6].reshape([-1, constant.height, constant.width, constant.channels])}
+                    )
+                    prediction = prediction_matrix[0]
+                    max_q_updated_state = np.amax(prediction)
+
+
+                    yk = chosen_experience[2] + discount_factor * max_q_updated_state
+
+
+                print("yk")
+                print(yk)
+                # train network
+                    # Predict network and set all target labels for non-chosen action
+                    # equal to prediction
+                targets = q_net.predict(
+                {'reflectance_input': chosen_experience[0].reshape([-1, 6]),
+                'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
                 )
-                prediction = prediction_matrix[0]
-                max_q_updated_state = np.amax(prediction)
+                # print("targets")
+                # print(targets)
 
+                targets[0, chosen_experience[1]] = yk
+                    # Set target value for chosen action equal to yk minus the q_values
+                    #predicted by net and s
+                # print("modi targets")
+                # print(targets)
+                    # Square this value
 
-                yk = chosen_experience[2] + discount_factor * max_q_updated_state
-
-
-            print("yk")
-            print(yk)
-            # train network
-                # Predict network and set all target labels for non-chosen action
-                # equal to prediction
-            targets = q_net.predict(
-            {'reflectance_input': chosen_experience[0].reshape([-1, 6]),
-            'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
-            )
-            # print("targets")
-            # print(targets)
-
-            targets[0, chosen_experience[1]] = yk
-                # Set target value for chosen action equal to yk minus the q_values
-                #predicted by net and s
-            # print("modi targets")
-            # print(targets)
-                # Square this value
-
-                # update q_net
-            if(i <= 0 and step <= 1):
-                motors.stop()
-            q_net.fit(
-            {'reflectance_input': chosen_experience[0].reshape([-1, 6]),
-            'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
-            ,targets, n_epoch=1)
-            # if enough time as passed set Q-dash to current q_net
-            if(step % 1 == 0):
-                q_dash = q_net
+                    # update q_net
+                if(i <= 0 and step <= 1):
+                    motors.stop()
+                q_net.fit(
+                {'reflectance_input': chosen_experience[0].reshape([-1, 6]),
+                'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
+                ,targets, n_epoch=1)
+                # if enough time as passed set Q-dash to current q_net
+                if(step % 1 == 0):
+                    q_dash = q_net
 
         #end main while
     #end episode for loop
