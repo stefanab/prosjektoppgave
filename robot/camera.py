@@ -11,6 +11,11 @@ class Camera():
         self.width      = width
         self.height     = height
         self.img_rot    = img_rot
+    
+
+    def __exit__(self, type, value, traceback):
+        self.camera.close()
+        print("camera closed")
 
     def get_value(self):  return self.value
 
