@@ -107,7 +107,7 @@ def conv_reflectance_neural_network_model2(n_actions=3, name="conv_ref_neural_ne
     #convnet = regression(convnet, optimizer='SGD', loss='categorical_crossentropy', name='targets')
     merged_net = fully_connected(merged_net, 32, activation='sigmoid', name='m_fc1')
     merged_net = fully_connected(merged_net, n_actions, activation='linear', name='m_fc2')
-    merged_net = regression(merged_net, optimizer='adam',learning_rate=0.0001, loss='mean_square', name='targets')
+    merged_net = regression(merged_net, optimizer='adam',learning_rate=netconstpar.l_rate, loss='mean_square', name='targets')
     model = tflearn.DNN(merged_net)
 
     return model, name
