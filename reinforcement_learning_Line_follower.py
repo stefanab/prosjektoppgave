@@ -95,12 +95,14 @@ def __main__():
 
                 action = rdm.randint(0,action_executor.n_actions-1)
             else:
-                q_values = q_net.predict({'reflectance_input': current_ref_state.reshape([-1, 6]), 'image_input': current_cam_state.reshape([-1, constant.height, constant.width, constant.channels])})
+                q_values = q_net.predict({
+                'reflectance_input': current_ref_state.reshape([-1, 6]),
+                'image_input': current_cam_state.reshape([-1, constant.height, constant.width, constant.channels])})
                 print("q_values for actions are:")
                 print(q_values)
                 was_random = False
                 action = np.argmax(q_values)
-
+            #end random if-else
 
             # get reward for current state
             reward, is_final_state = reward_function.calculate_reward(reflectance_sensors.get_value(discrete=True, debug=False), action, was_random)
@@ -170,7 +172,7 @@ def __main__():
                 'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
                 ,targets, n_epoch=1)
                 # if enough time as passed set Q-dash to current q_net
-                if(step % 1 == 0):
+                if(step % 5 == 0):
                     q_dash = q_net
 
         #end main while
