@@ -50,7 +50,7 @@ def __main__():
     action_executor     = RobotActionExecutor(motors)
     q_net, name         = neuralnets.conv_reflectance_neural_network_model2(n_actions=action_executor.n_actions)
 
-    trainer = Trainer(q_net)
+    trainer = Trainer(q_net, constant)
     modelh = ModelHandler()
 
     # check if we want to load some previous model or start
@@ -123,7 +123,7 @@ def __main__():
             # Store transition of (current_state, action, reward, updated_state)
             # Change to append if you want to store all experiences
             if(training):
-                trainer.train(q_net, [ action, reward, current_ref_state, updated_ref_state, is_final_state, current_cam_state, updated_cam_state])
+                q_net = trainer.train(q_net, [ action, reward, current_ref_state, updated_ref_state, is_final_state, current_cam_state, updated_cam_state], step, i, motors, discount_factor)
                 # experience.append([ action, reward, current_ref_state, updated_ref_state, is_final_state, current_cam_state, updated_cam_state])
                 #
                 # # Select a mini-batch of transitions to train on
