@@ -54,7 +54,7 @@ def conv_neural_network_model1(name="conv_neural_network_model1", shape=None, im
 
     return model
 
-def conv_reflectance_neural_network_model1(n_actions=3, name="conv_ref_neural_network_model2", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
+def conv_reflectance_neural_network_model1(n_actions=3, name="conv_ref_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
     convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
     reflectance = tflearn.input_data(shape=[None, 6], name="reflectance_input")
@@ -76,9 +76,38 @@ def conv_reflectance_neural_network_model1(n_actions=3, name="conv_ref_neural_ne
 
     merged_net = merge([convnet, reflectance], mode='concat', axis=1)
     #convnet = regression(convnet, optimizer='SGD', loss='categorical_crossentropy', name='targets')
-    merged_net = fully_connected(merged_net, 64, activation='sigmoid', name='m_fc1')
+    merged_net = fully_connected(merged_net, 128, activation='sigmoid', name='m_fc1')
     merged_net = fully_connected(merged_net, n_actions, activation='linear', name='m_fc2')
     merged_net = regression(merged_net, optimizer='adam',learning_rate=0.00001, loss='categorical_crossentropy', name='targets')
+    model = tflearn.DNN(merged_net)
+
+    return model, name
+
+def conv_reflectance_neural_network_model2(n_actions=3, name="conv_ref_neural_network_model2", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
+
+    convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
+    reflectance = tflearn.input_data(shape=[None, 6], name="reflectance_input")
+
+    convnet = conv_2d(convnet, 32, 8, strides=4, activation='relu', name='conv1')
+    #convnet = max_pool_2d(convnet, 2)
+
+    convnet = conv_2d(convnet, 64, 4, strides=2, activation='relu', name='conv2')
+    #convnet = max_pool_2d(convnet, 2)
+
+    convnet = conv_2d(convnet, 64, 3, strides=1, activation='relu', name='conv3')
+    #convnet = max_pool_2d(convnet, 2)
+
+
+    convnet= fully_connected(convnet, 256, activation='relu', name='fc1')
+    convnet = dropout(convnet, .8)
+
+    convnet = fully_connected(convnet, 16, activation='softmax', name='fc2')
+
+    merged_net = merge([convnet, reflectance], mode='concat', axis=1)
+    #convnet = regression(convnet, optimizer='SGD', loss='categorical_crossentropy', name='targets')
+    merged_net = fully_connected(merged_net, 32, activation='sigmoid', name='m_fc1')
+    merged_net = fully_connected(merged_net, n_actions, activation='linear', name='m_fc2')
+    merged_net = regression(merged_net, optimizer='adam',learning_rate=0.0001, loss='categorical_crossentropy', name='targets')
     model = tflearn.DNN(merged_net)
 
     return model, name
