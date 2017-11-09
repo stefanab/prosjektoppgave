@@ -40,8 +40,8 @@ class LineFollowerRewardFunction(RewardFunction):
         if sum_white ==  6:
 
             if not was_random:
-                return 1.0, True
-            return 1.0, True
+                return -1.0, True
+            return -1.0, True
         elif sum_white == 0:
             return  0.0, False
         else:
