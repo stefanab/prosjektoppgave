@@ -1,4 +1,5 @@
 import os
+from PIL import Image
 
 # Class to handle experience saving. The class should take as input the total experiences
 # in a run and save them to the correct "bucket". That is, the correct folder which is
@@ -58,5 +59,34 @@ class ExperienceHandler():
       print(count)
       return count
 
+    #experiences are build up of 5 or 7 columns (if cam = true)
+    # index nunmber:
+    # 0 action
+    # 1 reward
+    # 2 current_ref_state
+    # 3 updated_ref_state
+    # 4 is_final_state
+    # 5 current_cam_state
+    # 6 updated_cam_state
+    def process_experiences(self, experiences):
+        for experience in experiences:
 
-    def save_experiences(self, experiences):
+            if(self.cam):
+                self.current_cam_state.append(experience[5])
+                self.updated_cam_state.append(experience[6])
+
+            if(self.ref): #should always be true
+                self.current_ref_state.append(experience[2])
+                self.updated_ref_state.append(experience[3])
+
+            self.is_final_state.append(experience[4])
+            self.action.append(experience[0])
+            self.reward.append(experience[1])
+
+
+    def save_experiences_to_file(self):
+        pass
+
+
+    def load_experiences(self):
+        pass
