@@ -29,20 +29,20 @@ class LineFollowerRewardFunction(RewardFunction):
     # state the discrete colors of the state currrently in.
     # Also return whether this state is final
     def calculate_reward(self, state, action, was_random):
-        reward = 0
-        
+        reward = 0.0
+
         sum_white = 0
         for reading in state:
            if reading == 1:
                 sum_white += 1
-        
-        
+
+
         if sum_white ==  6:
-            
+
             if not was_random:
-                return reward - 1, True
-            return reward - 1, True
+                return reward - 1.0, True
+            return reward - 1.0, True
         elif sum_white == 0:
-            return reward + 1, False
+            return reward + 1.0, False
         else:
-            return reward + 0, False
+            return reward + 0.0, False

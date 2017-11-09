@@ -9,7 +9,6 @@ from robot.motors import Motors
 from robot.camera import Camera
 from filehandle.modelHandler import ModelHandler
 from line_follower_reward_function import LineFollowerRewardFunction
-from neuralnets import reflectance_neural_network_model2
 import neuralnets
 from robot_actions import RobotActionExecutor
 import tflearn
@@ -48,7 +47,7 @@ def __main__():
 
     reward_function     = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
     action_executor     = RobotActionExecutor(motors)
-    q_net, name         = neuralnets.conv_reflectance_neural_network_model1(n_actions=action_executor.n_actions)
+    q_net, name         = neuralnets.conv_reflectance_neural_network_model2(n_actions=action_executor.n_actions)
 
     modelh = ModelHandler()
 
@@ -59,7 +58,8 @@ def __main__():
 
     q_dash = q_net
 
-
+    test1 = np.array([0, 1, 2, 3])
+    test2 = np.array([4,5,6])
 
 
 
@@ -158,6 +158,7 @@ def __main__():
                 # print(targets)
 
                 targets[0, chosen_experience[1]] = yk
+                print(targets)
                     # Set target value for chosen action equal to yk minus the q_values
                     #predicted by net and s
                 # print("modi targets")
@@ -178,7 +179,7 @@ def __main__():
         #end main while
     #end episode for loop
 
-
+    print(len(experience))
     motors.stop()
     overwrite = False
     if(len(sys.argv) > 2):
