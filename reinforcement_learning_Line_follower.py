@@ -121,7 +121,7 @@ def __main__():
             # Store transition of (current_state, action, reward, updated_state)
             # Change to append if you want to store all experiences
             if(training):
-                experience.append([current_ref_state, action, reward, updated_ref_state, is_final_state, current_cam_state, updated_cam_state])
+                experience.append([ action, reward, current_ref_state, updated_ref_state, is_final_state, current_cam_state, updated_cam_state])
 
                 # Select a mini-batch of transitions to train on
                 chosen_experience = None
@@ -130,11 +130,10 @@ def __main__():
                 else:
                     chosen_experience = experience[rdm.randint(0, len(experience)-1)]
                 # Set target, yk, as rk if terminal state or as rk + max(Q-dash)
-                yk = 0
+                yk = chosen_experience[1]
 
-                if(chosen_experience[4]):
-                    yk = chosen_experience[2]
-                else:
+                if not chosen_experience[4]:
+
                     prediction_matrix = q_dash.predict(
                     {'reflectance_input': chosen_experience[3].reshape([-1, 6]),
                     'image_input': chosen_experience[6].reshape([-1, constant.height, constant.width, constant.channels])}
@@ -143,7 +142,7 @@ def __main__():
                     max_q_updated_state = np.amax(prediction)
 
 
-                    yk = chosen_experience[2] + discount_factor * max_q_updated_state
+                    yk += discount_factor * max_q_updated_state
 
 
                 print("yk")
@@ -152,7 +151,7 @@ def __main__():
                     # Predict network and set all target labels for non-chosen action
                     # equal to prediction
                 targets = q_net.predict(
-                {'reflectance_input': chosen_experience[0].reshape([-1, 6]),
+                {'reflectance_input': chosen_experience[2].reshape([-1, 6]),
                 'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
                 )
                 # print("targets")
@@ -170,7 +169,7 @@ def __main__():
                 if(i <= 0 and step <= 1):
                     motors.stop()
                 q_net.fit(
-                {'reflectance_input': chosen_experience[0].reshape([-1, 6]),
+                {'reflectance_input': chosen_experience[2].reshape([-1, 6]),
                 'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
                 ,targets, n_epoch=1)
                 # if enough time as passed set Q-dash to current q_net
