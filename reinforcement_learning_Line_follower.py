@@ -58,10 +58,11 @@ def __main__():
 
     q_dash = q_net
 
-    test1 = np.array([0, 1, 2, 3])
-    test2 = np.array([4,5,6])
-
-
+    test1 = [[0, 1, 2, 3]]
+    test2 = [[4,5,6]]
+    test3 = tf.concat([test1, test2], axis=1)
+    print("concated")
+    print(test3)
 
     #train_y = train_y.reshape([-1, 2])
     episodes = 20
