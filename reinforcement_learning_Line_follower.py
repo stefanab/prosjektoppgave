@@ -130,6 +130,7 @@ def __main__():
                 else:
                     chosen_experience = experience[rdm.randint(0, len(experience)-1)]
                 # Set target, yk, as rk if terminal state or as rk + max(Q-dash)
+
                 yk = chosen_experience[1]
 
                 if not chosen_experience[4]:
@@ -171,7 +172,7 @@ def __main__():
                 q_net.fit(
                 {'reflectance_input': chosen_experience[2].reshape([-1, 6]),
                 'image_input': chosen_experience[5].reshape([-1, constant.height, constant.width, constant.channels])}
-                ,targets, n_epoch=1)
+                ,{'targets': targets}, n_epoch=1)
                 # if enough time as passed set Q-dash to current q_net
                 if(step % 5 == 0):
                     q_dash = q_net
@@ -185,7 +186,9 @@ def __main__():
     if(len(sys.argv) > 2):
         if(sys.argv[2] == 'o'):
             overwrite = True
+    
     modelh.save(name + ".model", q_net, overwrite = overwrite)
+    
     camera.close()
     GPIO.cleanup()
     sys.exit(0)
