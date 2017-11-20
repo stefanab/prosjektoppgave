@@ -1,5 +1,6 @@
 import os
 from PIL import Image
+import numpy as np
 
 # Class to handle experience saving. The class should take as input the total experiences
 # in a run and save them to the correct "bucket". That is, the correct folder which is
@@ -11,7 +12,7 @@ from PIL import Image
 
 class ExperienceHandler():
 
-    def __init__(self, n_actions, ref, cam, timesteps=1, experiencefile="experienceFile.txt", default_experience_name="experience"):
+    def __init__(self, n_actions=0, ref=0, cam=0, timesteps=1, experiencefile="experienceFile.txt", default_experience_name="experience"):
         self.experience_file         = experiencefile
         self.default_experience_name = default_experience_name
 
@@ -29,7 +30,7 @@ class ExperienceHandler():
         self.action            = []
         self.reward            = []
         self.is_final_state    = []
-        self.file_number = self.modify_file(experiencefile)
+        #self.file_number = self.modify_file(experiencefile)
 
 
     def modify_file(self, filename):
@@ -84,9 +85,30 @@ class ExperienceHandler():
             self.reward.append(experience[1])
 
 
-    def save_experiences_to_file(self):
+    def save_experiences_to_file(self, numpy_array):
+        np.save("test.npy", numpy_array)
         pass
 
 
     def load_experiences(self):
-        pass
+        numpy_array = np.load("test.npy")
+        return numpy_array
+
+def __main__():
+    expHandle = ExperienceHandler()
+    liste = [1,2,3]
+    liste = np.array(liste)
+    array = [[0,0,0,0,0,0], True, 2, [24.2], liste]
+    array = np.array(array)
+    expHandle.save_experiences_to_file(array)
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(dir_path)
+    same_array = expHandle.load_experiences()
+    print("array")
+    print(array)
+    print("loaded array")
+    print(same_array)
+    print(array == same_array)
+
+if __name__ == "__main__":
+    __main__()
