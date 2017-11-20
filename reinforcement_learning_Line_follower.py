@@ -31,7 +31,9 @@ def pick_best_action(q_values_matrix):
 
 def __main__():
     #initialize all components
+    
     def signal_handler(signal, frame):
+        print("free resources")
         motors.stop()
         camera.close()
         GPIO.cleanup()
@@ -50,13 +52,13 @@ def __main__():
     action_executor     = RobotActionExecutor(motors)
     q_net, name         = neuralnets.conv_reflectance_neural_network_model2(n_actions=action_executor.n_actions)
 
-    trainer = Trainer(q_net, constant)
+    trainer = Trainer(q_net, constant, n_actions=action_executor.n_actions)
     modelh = ModelHandler()
 
     # check if we want to load some previous model or start
     # with a fresh one
     if(len(sys.argv) > 1):
-    	modelh.load(sys.argv[1], q_net)
+        modelh.load(sys.argv[1], q_net)
 
     q_dash = q_net
 
@@ -65,10 +67,10 @@ def __main__():
     test3 = tf.concat([test1, test2], axis=1)
     print("concated")
     print(test3)
-
+    
     #train_y = train_y.reshape([-1, 2])
-    episodes = 20
-    max_step = 10000
+    episodes = 50
+    max_step = 1000
     sec_cd = 5
     experience = []
     training = True
@@ -182,8 +184,10 @@ def __main__():
 
         #end main while
     #end episode for loop
-
-    print(len(experience))
+    if(training):
+        print("save from main")
+        trainer.save_experiences_to_file()
+        
     motors.stop()
     overwrite = False
     if(len(sys.argv) > 2):
@@ -192,6 +196,9 @@ def __main__():
 
     modelh.save(name + ".model", q_net, overwrite = overwrite)
 
+    
+    print("free resources")
+    motors.stop()
     camera.close()
     GPIO.cleanup()
     sys.exit(0)

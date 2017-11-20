@@ -24,7 +24,7 @@ def conv_neural_network_model(name="conv_neural_network_model", imconstpar=const
 
     convnet = fully_connected(convnet, 2, activation='softmax')
 
-    convnet = regression(convnet, optimizer='adam', loss='categorical_crossentropy', name='targets')
+    convnet = regression(convnet, optimizer='adam', loss='mean_square', name='targets')
 
     model = tflearn.DNN(convnet)
 
@@ -48,7 +48,7 @@ def conv_neural_network_model1(name="conv_neural_network_model1", shape=None, im
 
     convnet = fully_connected(convnet, 2, activation='softmax')
 
-    convnet = regression(convnet, optimizer='SGD', loss='categorical_crossentropy', name='targets')
+    convnet = regression(convnet, optimizer='SGD', loss='mean_square', name='targets')
 
     model = tflearn.DNN(convnet)
 

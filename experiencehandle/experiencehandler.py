@@ -1,6 +1,9 @@
 import os
 from PIL import Image
 import numpy as np
+import glob
+import sys
+import tempfile
 
 # Class to handle experience saving. The class should take as input the total experiences
 # in a run and save them to the correct "bucket". That is, the correct folder which is
@@ -12,9 +15,9 @@ import numpy as np
 
 class ExperienceHandler():
 
-    def __init__(self, n_actions=0, ref=0, cam=0, timesteps=1, experiencefile="experienceFile.txt", default_experience_name="experience"):
+    def __init__(self, n_actions=3, ref=True, cam=True, timesteps=1, experiencefile="experienceFile.txt", default_experience_name="experience"):
         self.experience_file         = experiencefile
-        self.default_experience_name = default_experience_name
+        self.experience_name         = default_experience_name
 
         self.timesteps = timesteps
         self.ref = ref
@@ -86,20 +89,32 @@ class ExperienceHandler():
 
 
     def save_experiences_to_file(self, numpy_array):
-        np.save("test.npy", numpy_array)
+        print("save from exphandl")
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(dir_path)
+        count = self.modify_file(self.experience_file)
+        print("saving array to:")
+        print(dir_path)
+        np.save(self.experience_name + str(count) + ".npy", numpy_array)
         pass
 
 
     def load_experiences(self):
-        numpy_array = np.load("test.npy")
-        return numpy_array
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(dir_path)
+        match = glob.glob(dir_path + "/*.npy")
+        if(len(match) != 0):
+            numpy_array = np.load("experience0.npy")
+            return numpy_array
 
 def __main__():
     expHandle = ExperienceHandler()
     liste = [1,2,3]
     liste = np.array(liste)
-    array = [[0,0,0,0,0,0], True, 2, [24.2], liste]
+    array = [[0,0,0,0,0,0], True, 2, [24.2], liste, "two"]
+    array.append(np.array([1, 0]))
     array = np.array(array)
+    print(array.dtype)
     expHandle.save_experiences_to_file(array)
     dir_path = os.path.dirname(os.path.realpath(__file__))
     os.chdir(dir_path)
@@ -109,6 +124,7 @@ def __main__():
     print("loaded array")
     print(same_array)
     print(array == same_array)
+    pass
 
 if __name__ == "__main__":
     __main__()
