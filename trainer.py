@@ -26,7 +26,7 @@ class Trainer():
         self.experiences = np.array(self.experiences, dtype=object)
         exp_handler.save_experiences_to_file(self.experiences)
 
-    def simulate_training(self, experiences, q_net, motors=None, q_dash_update=10, batch_size=64, n_epochs=5000):
+    def simulate_training(self, experiences, q_net, motors=None, q_dash_update=10, batch_size=64, n_epochs=1000):
 
         discount_factor = 0.8
         if(len(experiences) < 2*batch_size):
