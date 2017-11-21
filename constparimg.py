@@ -9,8 +9,8 @@ class constantParametersImage():
 
 	def setup(self):
 	    #Images in tensorflow take input as [height, width, channel]
-		self.height = 96
-                self.width  = 156
+		self.height = 32
+                self.width  = 128
 		self.color  = True
 		self.channels = 3 if self.color else 1
 
@@ -20,6 +20,7 @@ class constantParametersNetwork():
 		self.setup()
 
 	def setup(self):
+                self.batch         = False
 		self.n_classes     = 2
 		self.n_epochs      = 1000
 		self.batch_size    = 128

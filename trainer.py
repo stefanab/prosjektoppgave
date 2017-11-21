@@ -11,9 +11,10 @@ from experiencehandle.experiencehandler import ExperienceHandler
 
 class Trainer():
 
-    def __init__(self, net_model, constant, n_actions=3):
+    def __init__(self, net_model, constant, constNet, n_actions=3):
         self.n_actions = n_actions
         self.constant   = constant
+        self.constNet = constNet
         self.experiences = []
         self.q_dash = net_model
 
@@ -113,12 +114,13 @@ class Trainer():
         target_outputs  = []
         cam_inputs      = []
         ref_inputs      = []
-        if(len(self.experiences) < 2*batch_size):
+        if(not self.constNet.batch or len(self.experiences) < 2*batch_size):
             batch_size = 1
         # Select a mini-batch of transitions to train on
         for sample in range(batch_size):
             chosen_experience = self.experiences[rdm.randint(0, len(self.experiences)-1)]
-
+            if batch_size == 1:
+                chosen_experience = experience
             # Set target, yk, as rk if terminal state or as rk + max(Q-dash)
 
             yk = chosen_experience[1]
