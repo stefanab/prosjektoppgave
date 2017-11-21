@@ -10,7 +10,7 @@ class constantParametersImage():
 	def setup(self):
 	    #Images in tensorflow take input as [height, width, channel]
 		self.height = 96
-		self.width  = 128
+                self.width  = 156
 		self.color  = True
 		self.channels = 3 if self.color else 1
 

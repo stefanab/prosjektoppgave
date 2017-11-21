@@ -41,12 +41,13 @@ def __main__():
     signal.signal(signal.SIGINT, signal_handler)
 
     discount_factor = 0.8
+    constant = cpi.constantParametersImage()
 
     motors = Motors()
-    camera = Camera(save=True)
+    camera = Camera(save=True, width=constant.width, height=constant.height)
     reflectance_sensors = ReflectanceSensors(motob=motors, auto_calibrate=True)
 
-    constant            = cpi.constantParametersImage()
+
 
     reward_function     = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
     action_executor     = RobotActionExecutor(motors)
@@ -69,7 +70,7 @@ def __main__():
     print(test3)
 
     #train_y = train_y.reshape([-1, 2])
-    episodes = 20
+    episodes = 1
     max_step = 1000
     sec_cd = 5
     experience = []
