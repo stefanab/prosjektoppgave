@@ -33,7 +33,7 @@ with picamera.PiCamera(resolution=(128,96), framerate=30) as camera:
    # finally:
     
     
-            
+   camera.close()         
 ##    for i in range(100):
 ##        camera.capture('imagefalse%d.jpg' % (i,))
 ##        sleep(.1)

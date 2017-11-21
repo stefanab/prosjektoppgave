@@ -6,7 +6,7 @@ from time import sleep
 
 class Camera():
 
-    def __init__(self, save=True, width=256, height=64, img_rot=0):
+    def __init__(self, width, height,save=True, img_rot=0):
         camera     = picam.PiCamera(resolution=(width, height), framerate=30)
         camera.iso = 200
         
@@ -21,6 +21,7 @@ class Camera():
         
         
         self.camera = camera
+        print(self.camera)
         self.save = save
         self.count = 0
         self.value      = None
@@ -53,9 +54,11 @@ class Camera():
         self.camera.close()
 
     def sensor_get_value(self):
+        print("setting stream")
         stream = io.BytesIO()
+        print("capturing pic")
         self.value = self.camera.capture(stream, format='jpeg')
-        
+        print("resetting stream")
         stream.seek(0)
 
 

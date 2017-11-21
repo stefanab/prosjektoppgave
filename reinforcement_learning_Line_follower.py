@@ -42,9 +42,12 @@ def __main__():
 
     discount_factor = 0.8
     constant = cpi.constantParametersImage()
-
+    constNet = cpi.constantParametersNetwork()
     motors = Motors()
-    camera = Camera(save=True, width=constant.width, height=constant.height)
+    
+    camera = Camera(constant.width, constant.height, save=True)
+    print("completed stting up cam")
+    print(camera)
     reflectance_sensors = ReflectanceSensors(motob=motors, auto_calibrate=True)
 
 
@@ -53,7 +56,7 @@ def __main__():
     action_executor     = RobotActionExecutor(motors)
     q_net, name         = neuralnets.conv_reflectance_neural_network_model4(n_actions=action_executor.n_actions)
 
-    trainer = Trainer(q_net, constant, n_actions=action_executor.n_actions)
+    trainer = Trainer(q_net, constant, constNet,  n_actions=action_executor.n_actions)
     modelh = ModelHandler()
 
     # check if we want to load some previous model or start
@@ -62,7 +65,7 @@ def __main__():
         modelh.load(sys.argv[1], q_net)
 
     q_dash = q_net
-
+    motors.forward(dur=1)
     test1 = [[0, 1, 2, 3]]
     test2 = [[4,5,6]]
     test3 = tf.concat([test1, test2], axis=1)
@@ -70,7 +73,7 @@ def __main__():
     print(test3)
 
     #train_y = train_y.reshape([-1, 2])
-    episodes = 1
+    episodes = 3
     max_step = 1000
     sec_cd = 5
     experience = []
@@ -82,8 +85,10 @@ def __main__():
         sleep(sec_cd)
         is_final_state = False
         step = 0
+        
         reflectance_sensors.update()
         updated_ref_state = reflectance_sensors.get_value()
+        print(updated_ref_state)
         camera.update()
         updated_cam_state = camera.get_value()
 
