@@ -45,12 +45,13 @@ class ModelHandler():
     def save(self, name, model, overwrite=False):
         dir_path = os.path.dirname(os.path.realpath(__file__))
         os.chdir(dir_path)
+        print("saving model to")
         print(dir_path)
         if(not overwrite):
             # Find courrent directory and check if there already exists a file
             # with the specified name
             print("checking directory for model...")
-            
+
             match = glob.glob(dir_path + "/" + name + ".index")
 
             if(len(match) != 0):

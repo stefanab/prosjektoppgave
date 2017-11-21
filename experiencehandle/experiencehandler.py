@@ -103,27 +103,35 @@ class ExperienceHandler():
         dir_path = os.path.dirname(os.path.realpath(__file__))
         os.chdir(dir_path)
         match = glob.glob(dir_path + "/*.npy")
+        #print(match)
         if(len(match) != 0):
-            numpy_array = np.load("experience0.npy")
-            return numpy_array
+            flattened_array = []
+            for array in match:
+                print(array)
+                numpy_array = np.load(array, encoding='bytes')
+                print (numpy_array.shape)
+                for exp in numpy_array:
+                    flattened_array.append(exp)
+
+            flattened_array = np.array(flattened_array)
+            print(flattened_array.shape)
+            return flattened_array
 
 def __main__():
     expHandle = ExperienceHandler()
-    liste = [1,2,3]
-    liste = np.array(liste)
-    array = [[0,0,0,0,0,0], True, 2, [24.2], liste, "two"]
-    array.append(np.array([1, 0]))
-    array = np.array(array)
-    print(array.dtype)
-    expHandle.save_experiences_to_file(array)
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    os.chdir(dir_path)
+    # liste = [1,2,3]
+    # liste = np.array(liste)
+    # array = [[0,0,0,0,0,0], True, 2, [24.2], liste, "two"]
+    # array.append(np.array([1, 0]))
+    # array = np.array(array)
+    # print(array.dtype)
+    # expHandle.save_experiences_to_file(array)
+    # dir_path = os.path.dirname(os.path.realpath(__file__))
+    # os.chdir(dir_path)
     same_array = expHandle.load_experiences()
     print("array")
-    print(array)
-    print("loaded array")
     print(same_array)
-    print(array == same_array)
+
     pass
 
 if __name__ == "__main__":
