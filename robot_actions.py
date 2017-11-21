@@ -20,7 +20,7 @@ class RobotActionExecutor():
         if action_number == 0:
             self.motors.set_value([0, 400])
         elif action_number == 1:
-            self.motors.set_value([200, 200])
+            self.motors.set_value([250, 250])
         elif action_number == 2:
         #     self.motors.set_value([100, 250])
         # elif action_number == 3:

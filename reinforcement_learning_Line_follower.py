@@ -43,14 +43,14 @@ def __main__():
     discount_factor = 0.8
 
     motors = Motors()
-    camera = Camera()
+    camera = Camera(save=True)
     reflectance_sensors = ReflectanceSensors(motob=motors, auto_calibrate=True)
 
     constant            = cpi.constantParametersImage()
 
     reward_function     = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
     action_executor     = RobotActionExecutor(motors)
-    q_net, name         = neuralnets.conv_reflectance_neural_network_model2(n_actions=action_executor.n_actions)
+    q_net, name         = neuralnets.conv_reflectance_neural_network_model4(n_actions=action_executor.n_actions)
 
     trainer = Trainer(q_net, constant, n_actions=action_executor.n_actions)
     modelh = ModelHandler()
@@ -69,7 +69,7 @@ def __main__():
     print(test3)
 
     #train_y = train_y.reshape([-1, 2])
-    episodes = 50
+    episodes = 20
     max_step = 1000
     sec_cd = 5
     experience = []
@@ -96,7 +96,7 @@ def __main__():
 
             # Chose action randomly or pick best action
             was_random = True
-            if(rdm.random() < (.1+(1/(1+step*i))) and training):
+            if(rdm.random() < (.3+(1/(1+step*i))) and training):
 
                 action = rdm.randint(0,action_executor.n_actions-1)
             else:
@@ -125,7 +125,7 @@ def __main__():
             # Store transition of (current_state, action, reward, updated_state)
             # Change to append if you want to store all experiences
             if(training):
-                q_net = trainer.train(q_net, [ action, reward, current_ref_state, updated_ref_state, is_final_state, current_cam_state, updated_cam_state], step, i, motors=motors, discount_factor)
+                q_net = trainer.train(q_net, [ action, reward, current_ref_state, updated_ref_state, is_final_state, current_cam_state, updated_cam_state], step, i, discount_factor, motors=motors)
 
 
         #end main while
@@ -139,7 +139,8 @@ def __main__():
     if(len(sys.argv) > 2):
         if(sys.argv[2] == 'o'):
             overwrite = True
-
+    print("saving as")
+    print(name)
     modelh.save(name + ".model", q_net, overwrite = overwrite)
 
 
