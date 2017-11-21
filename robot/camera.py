@@ -6,7 +6,7 @@ from time import sleep
 
 class Camera():
 
-    def __init__(self, save=True, width=128, height=96, img_rot=0):
+    def __init__(self, save=True, width=256, height=64, img_rot=0):
         camera     = picam.PiCamera(resolution=(width, height), framerate=30)
         camera.iso = 200
         
