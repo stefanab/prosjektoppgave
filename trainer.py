@@ -27,7 +27,7 @@ class Trainer():
         self.experiences = np.array(self.experiences, dtype=object)
         exp_handler.save_experiences_to_file(self.experiences)
 
-    def simulate_training(self, experiences, q_net, motors=None, q_dash_update=10, batch_size=64, n_epochs=1000):
+    def simulate_training(self, experiences, q_net, motors=None, q_dash_update=10, batch_size=64, n_epochs=10000):
 
         discount_factor = 0.8
         if(len(experiences) < 2*batch_size):
@@ -52,7 +52,8 @@ class Trainer():
                     )
                     prediction = prediction_matrix[0]
                     max_q_updated_state = np.amax(prediction)
-                    if epoch % 100 == 0:
+                    if epoch % 100 == 0 and sample == 0:
+                        print(chosen_experience[2])
                         print("max q")
                         print(max_q_updated_state)
                     yk += discount_factor * max_q_updated_state
@@ -66,19 +67,14 @@ class Trainer():
                 {'reflectance_input': chosen_experience[2].reshape([-1, 6]),
                 'image_input': chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])}
                 )
-                if epoch % 100 == 0:
-                    print("ref state")
-                    print(chosen_experience[2])
-                    print("diff")
-                    temp_targets = targets
-                    print(targets)
 
+                if epoch % 100 == 0 and sample == 0:
+                    print(targets)
 
                 targets[0, chosen_experience[0]] = yk
-                if epoch % 100 == 0:
-                    print(targets)
-                    print(yk)
 
+                if epoch % 100 == 0 and sample == 0:
+                    print(targets)
                     # Set target value for chosen action equal to yk minus the q_values
                     #predicted by net and s
                 # print("modi targets")
