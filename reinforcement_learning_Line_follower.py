@@ -54,7 +54,7 @@ def __main__():
 
     reward_function     = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
     action_executor     = RobotActionExecutor(motors)
-    q_net, name         = neuralnets.conv_reflectance_neural_network_model4(n_actions=action_executor.n_actions)
+    q_net, name         = neuralnets.conv_reflectance_neural_network_model5(n_actions=action_executor.n_actions)
 
     trainer = Trainer(q_net, constant, constNet,  n_actions=action_executor.n_actions)
     modelh = ModelHandler()
@@ -65,15 +65,9 @@ def __main__():
         modelh.load(sys.argv[1], q_net)
 
     q_dash = q_net
-    motors.forward(dur=1)
-    test1 = [[0, 1, 2, 3]]
-    test2 = [[4,5,6]]
-    test3 = tf.concat([test1, test2], axis=1)
-    print("concated")
-    print(test3)
 
-    #train_y = train_y.reshape([-1, 2])
-    episodes = 3
+#train_y = train_y.reshape([-1, 2])
+    episodes = 30
     max_step = 1000
     sec_cd = 5
     experience = []
@@ -102,7 +96,7 @@ def __main__():
 
             # Chose action randomly or pick best action
             was_random = True
-            if(rdm.random() < (.3+(1/(1+step*i))) and training):
+            if(rdm.random() < (.1+(1/(1+step*i))) and training):
 
                 action = rdm.randint(0,action_executor.n_actions-1)
             else:

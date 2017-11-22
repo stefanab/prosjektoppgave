@@ -54,11 +54,11 @@ class Camera():
         self.camera.close()
 
     def sensor_get_value(self):
-        print("setting stream")
+
         stream = io.BytesIO()
-        print("capturing pic")
+
         self.value = self.camera.capture(stream, format='jpeg')
-        print("resetting stream")
+ 
         stream.seek(0)
 
 
