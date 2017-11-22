@@ -18,14 +18,15 @@ def __main__():
     discount_factor = 0.8
     n_actions = 3
     constant            = cpi.constantParametersImage()
+    constantNet            = cpi.constantParametersNetwork()
 
     print("setting up model")
 
-    q_net, name         = neuralnets.conv_reflectance_neural_network_model4(n_actions=n_actions)
+    q_net, name         = neuralnets.conv_reflectance_neural_network_model5(n_actions=n_actions)
 
     print("creating trainer")
 
-    trainer = Trainer(q_net, constant, n_actions=n_actions)
+    trainer = Trainer(q_net, constant, constantNet, n_actions=n_actions)
 
     modelh = ModelHandler()
     exph   = ExperienceHandler()
@@ -41,6 +42,9 @@ def __main__():
     training = True
 
     experiences = exph.load_experiences()
+    experi = np.array(experiences).shape
+    print(experi)
+    sleep(5)
     q_net = trainer.simulate_training(experiences, q_net)
 
     overwrite = False
