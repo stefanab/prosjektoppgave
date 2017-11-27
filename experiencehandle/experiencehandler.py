@@ -23,7 +23,7 @@ class ExperienceHandler():
         self.ref = ref
         self.cam = cam
         self.n_actions = n_actions
-
+        self.corrupt_exp = 0
         if(cam):
             self.current_cam_state = []
             self.updated_cam_state = []
@@ -129,8 +129,18 @@ def __main__():
     # dir_path = os.path.dirname(os.path.realpath(__file__))
     # os.chdir(dir_path)
     same_array = expHandle.load_experiences()
-    print("array")
-    print(same_array)
+    print(same_array.shape)
+    for exp in same_array:
+    
+        if exp[4]:
+            print("is final state")
+            print(exp[2])
+            print(exp[3])
+
+
+    print("number of corrupted")
+    print(self.corrupt_exp)
+
 
     pass
 

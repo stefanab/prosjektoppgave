@@ -44,7 +44,7 @@ def __main__():
     constant = cpi.constantParametersImage()
     constNet = cpi.constantParametersNetwork()
     motors = Motors()
-    
+
     camera = Camera(constant.width, constant.height, save=True)
     print("completed stting up cam")
     print(camera)
@@ -85,7 +85,7 @@ def __main__():
         sleep(sec_cd)
         is_final_state = False
         step = 0
-        
+
         reflectance_sensors.update()
         updated_ref_state = reflectance_sensors.get_value()
         print(updated_ref_state)
@@ -116,7 +116,7 @@ def __main__():
             #end random if-else
 
             # get reward for current state
-            reward, is_final_state = reward_function.calculate_reward(reflectance_sensors.get_value(discrete=True, debug=False), action, was_random)
+
 
             # Do selected action (update state)
             action_executor.do_action(action)
@@ -128,6 +128,7 @@ def __main__():
             camera.update()
             updated_ref_state = reflectance_sensors.get_value()
             updated_cam_state = camera.get_value()
+            reward, is_final_state = reward_function.calculate_reward(updated_ref_state, action, was_random)
             # Store transition of (current_state, action, reward, updated_state)
             # Change to append if you want to store all experiences
             if(training):

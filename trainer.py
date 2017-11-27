@@ -17,6 +17,7 @@ class Trainer():
         self.constNet = constNet
         self.experiences = []
         self.q_dash = net_model
+        
 
 
     def save_experiences_to_file(self):
