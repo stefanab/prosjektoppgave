@@ -8,7 +8,7 @@ from constparimg import constantParametersImage, constantParametersNetwork
 
 def conv_neural_network_model(name="conv_neural_network_model", imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
-    convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='input')
+    convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
 
     convnet = conv_2d(convnet, 32, 8, strides=4, activation='relu')
     #convnet = max_pool_2d(convnet, 2)
@@ -32,7 +32,7 @@ def conv_neural_network_model(name="conv_neural_network_model", imconstpar=const
 
 def conv_neural_network_model1(name="conv_neural_network_model1", shape=None, imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
-    convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='input')
+    convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
 
     convnet = conv_2d(convnet, 32, 8, strides=4, activation='relu')
     #convnet = max_pool_2d(convnet, 2)
@@ -208,7 +208,7 @@ def conv_reflectance_neural_network_model2(n_actions=3, name="conv_ref_neural_ne
 
 def cam_conv_model(n_actions=3, name="cam_conv_model", imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
-    convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='input')
+    convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
 
     convnet = conv_2d(convnet, 32, 8, strides=4, activation='relu')
     #convnet = max_pool_2d(convnet, 2)
@@ -234,7 +234,7 @@ def cam_conv_model(n_actions=3, name="cam_conv_model", imconstpar=constantParame
 
 
 def reflectance_neural_network_model(name="reflectance_neural_network_model", n_actions=5, shape=[None, 1, 6, 1]):
-    ref = input_data(shape=shape, name='input')
+    ref = input_data(shape=shape, name='refleactance_input')
     ref = fully_connected(ref, 64, activation='relu')
     ref = dropout(ref, .8)
 
@@ -247,7 +247,7 @@ def reflectance_neural_network_model(name="reflectance_neural_network_model", n_
     return model
 
 def reflectance_neural_network_model3(n_actions=5, name="reflectance_neural_network_model3", shape=[None, 1, 18, 1]):
-    ref = input_data(shape=shape, name='input')
+    ref = input_data(shape=shape, name='reflectance_input')
     ref = fully_connected(ref, 32, activation='relu')
     ref = dropout(ref, .8)
 
@@ -260,7 +260,7 @@ def reflectance_neural_network_model3(n_actions=5, name="reflectance_neural_netw
     return model
 
 def reflectance_neural_network_model2(n_actions=5, name="reflectance_neural_network_model2", shape=[None, 1, 6, 1]):
-    ref = input_data(shape=shape, name='input')
+    ref = input_data(shape=shape, name='reflectance_input')
 
     ref = fully_connected(ref, n_actions, activation='tanh')
 
