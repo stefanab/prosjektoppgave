@@ -28,7 +28,7 @@ class Trainer():
         self.experiences = np.array(self.experiences, dtype=object)
         exp_handler.save_experiences_to_file(self.experiences)
 
-    def simulate_training(self, experiences, q_net, motors=None, q_dash_update=10, batch_size=64, n_epochs=10000):
+    def simulate_training(self, experiences, q_net, motors=None, q_dash_update=10, batch_size=64, n_epochs=1000):
 
         discount_factor = 0.8
         if(len(experiences) < 2*batch_size):
@@ -36,7 +36,7 @@ class Trainer():
         # Select a mini-batch of transitions to train on
         for epoch in range(n_epochs):
             target_outputs  = []
-            cam_inputs      = []
+            #cam_inputs      = []
             ref_inputs      = []
             for sample in range(batch_size):
                 chosen_experience = experiences[rdm.randint(0, len(experiences)-1)]
@@ -48,8 +48,9 @@ class Trainer():
                 if not chosen_experience[4]:
 
                     prediction_matrix = self.q_dash.predict(
-                    {'reflectance_input': chosen_experience[3].reshape([-1, 6]),
-                    'image_input': chosen_experience[6].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])}
+                    {'reflectance_input': chosen_experience[3].reshape([-1, 6])
+                    #,'image_input': chosen_experience[6].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])
+                    }
                     )
                     prediction = prediction_matrix[0]
                     max_q_updated_state = np.amax(prediction)
@@ -65,8 +66,9 @@ class Trainer():
                     # Predict network and set all target labels for non-chosen action
                     # equal to prediction
                 targets = q_net.predict(
-                {'reflectance_input': chosen_experience[2].reshape([-1, 6]),
-                'image_input': chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])}
+                {'reflectance_input': chosen_experience[2].reshape([-1, 6])
+                #,'image_input': chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])
+                }
                 )
 
                 if epoch % 100 == 0 and sample == 0:
@@ -84,18 +86,19 @@ class Trainer():
 
                     # update q_net
                 ref_inputs.append([chosen_experience[2].reshape([-1, 6])])
-                cam_inputs.append([chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])])
+                #cam_inputs.append([chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])])
                 target_outputs.append(targets)
                 #end batch generation for loop
 
             ref_inputs = np.array(ref_inputs).reshape([-1, 6])
-            cam_inputs = np.array(cam_inputs).reshape([-1, self.constant.height, self.constant.width, self.constant.channels])
+            #cam_inputs = np.array(cam_inputs).reshape([-1, self.constant.height, self.constant.width, self.constant.channels])
             target_outputs = np.array(target_outputs).reshape([-1, self.n_actions])
 
 
             q_net.fit(
-            {'reflectance_input': ref_inputs,
-            'image_input': cam_inputs}
+            {'reflectance_input': ref_inputs
+             #,'image_input': cam_inputs
+             }
             ,{'targets': target_outputs}, n_epoch=1)
             # if enough time as passed set Q-dash to current q_net
             if(epoch+1 % q_dash_update == 0):
@@ -125,9 +128,10 @@ class Trainer():
             if not chosen_experience[4]:
 
                 prediction_matrix = self.q_dash.predict(
-                {'reflectance_input': chosen_experience[3].reshape([-1, 6]),
-                'image_input': chosen_experience[6].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])}
-                )
+                {#'reflectance_input': chosen_experience[3].reshape([-1, 6])
+                 #,
+                 'image_input': chosen_experience[6].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])
+                 })
                 prediction = prediction_matrix[0]
                 max_q_updated_state = np.amax(prediction)
 
@@ -140,8 +144,10 @@ class Trainer():
                 # Predict network and set all target labels for non-chosen action
                 # equal to prediction
             targets = q_net.predict(
-            {'reflectance_input': chosen_experience[2].reshape([-1, 6]),
-            'image_input': chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])}
+            {#'reflectance_input': chosen_experience[2].reshape([-1, 6])
+             #,
+             'image_input': chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])
+             }
             )
             if sample == 1:
                 print("yk")
@@ -159,19 +165,21 @@ class Trainer():
                 # Square this value
 
                 # update q_net
-            ref_inputs.append([chosen_experience[2].reshape([-1, 6])])
+            #ref_inputs.append([chosen_experience[2].reshape([-1, 6])])
             cam_inputs.append([chosen_experience[5].reshape([-1, self.constant.height, self.constant.width, self.constant.channels])])
             target_outputs.append(targets)
             #end batch generation for loop
 
-        ref_inputs = np.array(ref_inputs).reshape([-1, 6])
+        #ref_inputs = np.array(ref_inputs).reshape([-1, 6])
         cam_inputs = np.array(cam_inputs).reshape([-1, self.constant.height, self.constant.width, self.constant.channels])
         target_outputs = np.array(target_outputs).reshape([-1, self.n_actions])
         if(i <= 0 and step <= 1 and motors != None):
             motors.stop()
         q_net.fit(
-        {'reflectance_input': ref_inputs,
-        'image_input': cam_inputs}
+        {#'reflectance_input': ref_inputs
+         #,
+         'image_input': cam_inputs
+         }
         ,{'targets': target_outputs}, n_epoch=1)
         # if enough time as passed set Q-dash to current q_net
         if(step % 5 == 0):

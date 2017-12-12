@@ -22,7 +22,7 @@ def __main__():
 
     print("setting up model")
 
-    q_net, name         = neuralnets.conv_reflectance_neural_network_model5(n_actions=n_actions)
+    q_net, name         = neuralnets.ref2(n_actions=n_actions)
 
     print("creating trainer")
 

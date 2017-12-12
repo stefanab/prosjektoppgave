@@ -18,7 +18,7 @@ class RobotActionExecutor():
     # default is to stop
     def do_action(self, action_number):
         if action_number == 0:
-            self.motors.set_value([0, 400])
+            self.motors.set_value([-200, 500])
         elif action_number == 1:
             self.motors.set_value([250, 250])
         elif action_number == 2:
@@ -32,6 +32,6 @@ class RobotActionExecutor():
         # # elif action_number == 6:
          #   self.motors.set_value([300, 100])
         #elif action_number == 4:
-            self.motors.set_value([400, 0])
+            self.motors.set_value([500, -200])
         else:
             self.motors.set_value([0, 0])

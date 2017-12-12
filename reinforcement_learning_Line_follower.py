@@ -40,21 +40,24 @@ def __main__():
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
-    discount_factor = 0.8
+    discount_factor = 0.9
     constant = cpi.constantParametersImage()
     constNet = cpi.constantParametersNetwork()
     motors = Motors()
-
-    camera = Camera(constant.width, constant.height, save=True)
+    camera = None
+    reflectance_sensors = None
+    if constNet.has_camera:
+        camera = Camera(constant.width, constant.height, save=True)
     print("completed stting up cam")
     print(camera)
-    reflectance_sensors = ReflectanceSensors(motob=motors, auto_calibrate=True)
+    if constNet.has_ref:
+        reflectance_sensors = ReflectanceSensors(motob=motors, auto_calibrate=True)
 
 
 
     reward_function     = LineFollowerRewardFunction(RewardFunction, reflectance_sensors)
     action_executor     = RobotActionExecutor(motors)
-    q_net, name         = neuralnets.conv_reflectance_neural_network_model5(n_actions=action_executor.n_actions)
+    q_net, name         = neuralnets.cam1(n_actions=action_executor.n_actions)
 
     trainer = Trainer(q_net, constant, constNet,  n_actions=action_executor.n_actions)
     modelh = ModelHandler()
@@ -67,10 +70,12 @@ def __main__():
     q_dash = q_net
 
 #train_y = train_y.reshape([-1, 2])
-    episodes = 30
+    episodes = 20
     max_step = 1000
     sec_cd = 5
     experience = []
+    current_cam_state = False
+    updated_cam_state = False
     training = True
     for i in range(episodes): # epiode for loop
         motors.stop()
@@ -79,7 +84,7 @@ def __main__():
         sleep(sec_cd)
         is_final_state = False
         step = 0
-
+        
         reflectance_sensors.update()
         updated_ref_state = reflectance_sensors.get_value()
         print(updated_ref_state)
@@ -101,8 +106,10 @@ def __main__():
                 action = rdm.randint(0,action_executor.n_actions-1)
             else:
                 q_values = q_net.predict({
-                'reflectance_input': current_ref_state.reshape([-1, 6]),
-                'image_input': current_cam_state.reshape([-1, constant.height, constant.width, constant.channels])})
+                #'reflectance_input': current_ref_state.reshape([-1, 6])
+                #,
+                'image_input': current_cam_state.reshape([-1, constant.height, constant.width, constant.channels])
+                })
                 print("q_values for actions are:")
                 print(q_values)
                 was_random = False
@@ -114,7 +121,7 @@ def __main__():
 
             # Do selected action (update state)
             action_executor.do_action(action)
-            sleep(0.051)
+            sleep(0.1)
             motors.stop()
             step += 1
 
@@ -147,7 +154,8 @@ def __main__():
 
     print("free resources")
     motors.stop()
-    camera.close()
+    if(constNet.has_camera):
+        camera.close()
     GPIO.cleanup()
     sys.exit(0)
 

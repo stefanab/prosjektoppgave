@@ -8,7 +8,7 @@ class Camera():
 
     def __init__(self, width, height,save=True, img_rot=0):
         camera     = picam.PiCamera(resolution=(width, height), framerate=30)
-        camera.iso = 200
+        camera.iso = 300
         
         
         camera.shutter_speed= camera.exposure_speed

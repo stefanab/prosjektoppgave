@@ -25,3 +25,5 @@ class constantParametersNetwork():
 		self.n_epochs      = 1000
 		self.batch_size    = 128
 		self.l_rate        = 0.00001
+		self.has_camera    = True
+		self.has_ref       = True

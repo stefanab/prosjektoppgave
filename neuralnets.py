@@ -206,7 +206,7 @@ def conv_reflectance_neural_network_model2(n_actions=3, name="conv_ref_neural_ne
     return model, name
 
 
-def cam_conv_model(n_actions=3, name="cam_conv_model", imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
+def cam1(n_actions=3, name="cam1", imconstpar=constantParametersImage(), netconstpar=constantParametersNetwork()):
 
     convnet = input_data(shape=[None, imconstpar.height, imconstpar.width, imconstpar.channels], name='image_input')
 
@@ -224,16 +224,16 @@ def cam_conv_model(n_actions=3, name="cam_conv_model", imconstpar=constantParame
     convnet= fully_connected(convnet, 6, activation='softmax')
     convnet = dropout(convnet, .8)
 
-    convnet = fully_connected(convnet, n_actions, activation='softmax')
+    convnet = fully_connected(convnet, n_actions, activation='linear')
 
     convnet = regression(convnet, optimizer='adam', loss='mean_square', name='targets')
 
     model = tflearn.DNN(convnet)
 
-    return model
+    return model, name
 
 
-def reflectance_neural_network_model(name="reflectance_neural_network_model", n_actions=5, shape=[None, 1, 6, 1]):
+def ref1(name="ref1", n_actions=3, shape=[None, 1, 6, 1]):
     ref = input_data(shape=shape, name='refleactance_input')
     ref = fully_connected(ref, 64, activation='relu')
     ref = dropout(ref, .8)
@@ -244,28 +244,28 @@ def reflectance_neural_network_model(name="reflectance_neural_network_model", n_
 
     model = tflearn.DNN(ref)
 
-    return model
+    return model, name
 
-def reflectance_neural_network_model3(n_actions=5, name="reflectance_neural_network_model3", shape=[None, 1, 18, 1]):
+def ref3(n_actions=3, name="ref3", shape=[None, 1, 18, 1]):
     ref = input_data(shape=shape, name='reflectance_input')
     ref = fully_connected(ref, 32, activation='relu')
     ref = dropout(ref, .8)
 
     ref = fully_connected(ref, n_actions, activation='softmax')
 
-    ref = regression(ref, optimizer='adam', loss='categorical_crossentropy', name='targets')
+    ref = regression(ref, optimizer='adam', loss='mean_square', name='targets')
 
     model = tflearn.DNN(ref)
 
-    return model
+    return model, name
 
-def reflectance_neural_network_model2(n_actions=5, name="reflectance_neural_network_model2", shape=[None, 1, 6, 1]):
+def ref2(n_actions=3, name="ref2", shape=[None, 6]):
     ref = input_data(shape=shape, name='reflectance_input')
 
-    ref = fully_connected(ref, n_actions, activation='tanh')
+    ref = fully_connected(ref, n_actions, activation='linear')
 
-    ref = regression(ref, optimizer='sgd', loss='categorical_crossentropy', name='targets')
+    ref = regression(ref, optimizer='sgd', loss='mean_square', name='targets')
 
     model = tflearn.DNN(ref)
 
-    return model
+    return model, name
